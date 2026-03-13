@@ -118,7 +118,7 @@ const Services = () => {
   ];
 
   return (
-    <section id="services" className="relative py-32 overflow-hidden">
+    <section id="services" className="relative py-20 overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img 
           src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=1920" 
@@ -132,15 +132,15 @@ const Services = () => {
         <div className="grid lg:grid-cols-3 gap-16">
           {categories.map((cat, i) => (
             <div key={i}>
-              <span className="text-white/40 text-[11px] uppercase tracking-[0.3em] mb-12 block">{cat.title}</span>
+              <span className="text-white/70 text-[11px] uppercase tracking-[0.3em] mb-12 block">{cat.title}</span>
               <div className="space-y-8">
                 {cat.items.map((item, j) => (
                   <div key={j} className="flex justify-between items-end border-b border-white/10 pb-4 group cursor-pointer">
                     <div>
                       <h3 className="text-2xl font-serif text-white group-hover:text-orange-500 transition-colors">{item.name}</h3>
-                      <p className="text-white/30 text-sm italic">{item.detail}</p>
+                      <p className="text-white/60 text-sm italic">{item.detail}</p>
                     </div>
-                    <div className="text-white/20 group-hover:text-orange-500 transition-colors">
+                    <div className="text-white/50 group-hover:text-orange-500 transition-colors">
                       <ChevronRight size={20} />
                     </div>
                   </div>
@@ -268,16 +268,16 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="py-32 bg-brand">
+    <section id="contact" className="py-20 bg-brand">
       <div className="max-w-[1800px] mx-auto px-8">
         <div className="grid lg:grid-cols-2 gap-32">
           <div>
             <h2 className="text-7xl font-serif text-ink mb-12 tracking-tighter">Book a Table</h2>
-            <p className="text-ink/60 text-xl font-serif leading-relaxed max-w-md">
+            <p className="text-ink/70 text-xl font-serif leading-relaxed max-w-md">
               Join us for an evening of sophisticated relaxation. For groups larger than 6, please contact us directly.
             </p>
             
-            <div className="mt-20 space-y-8 text-ink/80 font-serif">
+            <div className="mt-20 space-y-8 text-ink/90 font-serif">
               <div>
                 <h4 className="text-[11px] uppercase tracking-[0.3em] mb-2 opacity-40">Location</h4>
                 <p className="text-2xl">Pittsburgh, PA 15222</p>
@@ -333,12 +333,12 @@ const Contact = () => {
 
 const Footer = () => {
   return (
-    <footer className="bg-black py-32">
+    <footer className="bg-black py-16">
       <div className="max-w-[1800px] mx-auto px-8">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-20 mb-32">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-20 mb-16">
           <div className="max-w-md">
             <h3 className="text-4xl font-display text-white mb-8">LIT CIGAR LOUNGE</h3>
-            <p className="text-white/30 font-serif leading-relaxed">
+            <p className="text-white/60 font-serif leading-relaxed">
               Pittsburgh's premier sanctuary for cigar enthusiasts and professionals. 
               Experience the art of relaxation in an atmosphere of unparalleled sophistication.
             </p>
@@ -346,8 +346,8 @@ const Footer = () => {
           
           <div className="grid grid-cols-2 gap-20">
             <div>
-              <h4 className="text-[11px] uppercase tracking-[0.3em] text-white/40 mb-8">Navigation</h4>
-              <ul className="space-y-4 font-serif text-white/60">
+              <h4 className="text-[11px] uppercase tracking-[0.3em] text-white/70 mb-8">Navigation</h4>
+              <ul className="space-y-4 font-serif text-white/90">
                 <li><a href="#home" className="hover:text-white transition-colors">Home</a></li>
                 <li><a href="#services" className="hover:text-white transition-colors">Drink</a></li>
                 <li><a href="#events" className="hover:text-white transition-colors">Listen</a></li>
@@ -355,8 +355,8 @@ const Footer = () => {
               </ul>
             </div>
             <div>
-              <h4 className="text-[11px] uppercase tracking-[0.3em] text-white/40 mb-8">Social</h4>
-              <ul className="space-y-4 font-serif text-white/60">
+              <h4 className="text-[11px] uppercase tracking-[0.3em] text-white/70 mb-8">Social</h4>
+              <ul className="space-y-4 font-serif text-white/90">
                 <li><a href="#" className="hover:text-white transition-colors">Instagram</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Facebook</a></li>
               </ul>
@@ -364,7 +364,7 @@ const Footer = () => {
           </div>
         </div>
         
-        <div className="pt-12 border-t border-white/10 flex justify-between text-[11px] uppercase tracking-[0.3em] text-white/20">
+        <div className="pt-12 border-t border-white/10 flex justify-between text-[11px] uppercase tracking-[0.3em] text-white/50">
           <p>© 2026 LIT Cigar Lounge Pittsburgh.</p>
           <div className="flex gap-12">
             <a href="#">Privacy</a>
