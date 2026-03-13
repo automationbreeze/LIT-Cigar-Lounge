@@ -31,7 +31,7 @@ const Navbar = () => {
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'bg-brand/95 backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
       <div className="max-w-[1800px] mx-auto px-4 md:px-8 flex justify-between items-center relative">
-        <div className="flex-1 flex justify-start">
+        <div className="flex-none flex justify-start">
           <div className={`hidden md:flex gap-8 text-[13px] font-serif transition-colors duration-500 ${isScrolled ? 'text-ink/80' : 'text-white'}`}>
             <a href="#services" className="hover:opacity-70 transition-opacity">Drink</a>
             <a href="#events" className="hover:opacity-70 transition-opacity">Listen</a>
@@ -47,12 +47,12 @@ const Navbar = () => {
         </div>
 
         <a href="#home" className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
-          <span className="text-sm sm:text-lg md:text-2xl font-display font-bold tracking-tight text-ink whitespace-nowrap">
+          <span className="text-base sm:text-lg md:text-2xl font-display font-bold tracking-tight text-ink whitespace-nowrap">
             LIT CIGAR LOUNGE
           </span>
         </a>
 
-        <div className="flex-1 flex justify-end items-center gap-4 md:gap-8">
+        <div className="flex-none flex justify-end items-center gap-4 md:gap-8">
           <a 
             href="#contact" 
             className="bg-ink text-white px-3 sm:px-4 md:px-6 py-2 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest transition-all hover:bg-zinc-800 whitespace-nowrap"
@@ -96,15 +96,15 @@ const Hero = () => {
       <div className="relative z-10 w-full max-w-[1800px] px-4 md:px-8 text-center mt-12 md:mt-0">
         <div className="flex flex-row items-center justify-between mb-8 md:mb-12 border-b border-white/40 pb-6 md:pb-8 w-full max-w-4xl mx-auto">
           <div className="flex-1 h-px bg-white/40"></div>
-          <h2 className="text-sm sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Cigars</h2>
+          <h2 className="text-lg sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Cigars</h2>
           <div className="flex-1 h-px bg-white/40"></div>
-          <h2 className="text-sm sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Drinks</h2>
+          <h2 className="text-lg sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Drinks</h2>
           <div className="flex-1 h-px bg-white/40"></div>
-          <h2 className="text-sm sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12 whitespace-nowrap">Live Music</h2>
+          <h2 className="text-lg sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12 whitespace-nowrap">Live Music</h2>
           <div className="flex-1 h-px bg-white/40"></div>
         </div>
 
-        <h1 className="text-[13vw] md:text-[14vw] font-display font-bold leading-[0.85] text-white tracking-tight uppercase drop-shadow-2xl">
+        <h1 className="text-[16vw] md:text-[14vw] font-display font-bold leading-[0.85] text-white tracking-tight uppercase drop-shadow-2xl">
           LIT CIGAR LOUNGE
         </h1>
       </div>
