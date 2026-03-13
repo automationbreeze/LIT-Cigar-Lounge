@@ -80,7 +80,7 @@ const Navbar = () => {
 
 const Hero = () => {
   return (
-    <section id="home" className="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-[#fdf2f4]">
+    <section id="home" className="relative min-h-[100dvh] flex flex-col justify-center items-center overflow-hidden bg-[#fdf2f4]">
       <div className="absolute inset-0 z-0">
         <img 
           src="https://i.ibb.co/6KYPS6N/Gemini-Generated-Image-aa3y0zaa3y0zaa3y.png" 
@@ -93,18 +93,24 @@ const Hero = () => {
         <div className="absolute inset-0 bg-black/10"></div>
       </div>
 
-      <div className="relative z-10 w-full max-w-[1800px] px-4 md:px-8 text-center mt-12 md:mt-0">
-        <div className="flex flex-row items-center justify-between mb-8 md:mb-12 border-b border-white/40 pb-6 md:pb-8 w-full max-w-4xl mx-auto">
-          <div className="flex-1 h-px bg-white/40"></div>
-          <h2 className="text-lg sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Cigars</h2>
-          <div className="flex-1 h-px bg-white/40"></div>
-          <h2 className="text-lg sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Drinks</h2>
-          <div className="flex-1 h-px bg-white/40"></div>
-          <h2 className="text-lg sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12 whitespace-nowrap">Live Music</h2>
-          <div className="flex-1 h-px bg-white/40"></div>
+      <div className="relative z-10 w-full max-w-[1800px] px-4 md:px-8 text-center mt-8 md:mt-0">
+        <div className="grid grid-cols-3 items-center mb-8 md:mb-12 border-b border-white/40 pb-6 md:pb-8 w-full max-w-4xl mx-auto">
+          <div className="flex items-center justify-end">
+            <div className="hidden md:block flex-1 h-px bg-white/40"></div>
+            <h2 className="text-xl sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Cigars</h2>
+            <div className="w-6 sm:w-12 md:flex-1 h-px bg-white/40"></div>
+          </div>
+          <div className="text-center">
+            <h2 className="text-xl sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Drinks</h2>
+          </div>
+          <div className="flex items-center justify-start">
+            <div className="w-6 sm:w-12 md:flex-1 h-px bg-white/40"></div>
+            <h2 className="text-xl sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12 whitespace-nowrap">Live Music</h2>
+            <div className="hidden md:block flex-1 h-px bg-white/40"></div>
+          </div>
         </div>
 
-        <h1 className="text-[16vw] md:text-[14vw] font-display font-bold leading-[0.85] text-white tracking-tight uppercase drop-shadow-2xl">
+        <h1 className="text-[19vw] md:text-[14vw] font-display font-bold leading-[0.85] text-white tracking-tight uppercase drop-shadow-2xl">
           LIT CIGAR LOUNGE
         </h1>
       </div>
