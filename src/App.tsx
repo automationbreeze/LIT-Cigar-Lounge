@@ -20,6 +20,7 @@ import { useState, useEffect, FormEvent } from 'react';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > window.innerHeight - 100);
@@ -28,29 +29,49 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-brand/90 backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
-      <div className="max-w-[1800px] mx-auto px-8 flex justify-between items-center">
-        <div className={`flex gap-8 text-[13px] font-serif transition-colors duration-500 ${isScrolled ? 'text-ink/80' : 'text-white'}`}>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'bg-brand/95 backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
+      <div className="max-w-[1800px] mx-auto px-6 md:px-8 flex justify-between items-center">
+        <div className={`hidden md:flex gap-8 text-[13px] font-serif transition-colors duration-500 ${isScrolled ? 'text-ink/80' : 'text-white'}`}>
           <a href="#services" className="hover:opacity-70 transition-opacity">Drink</a>
           <a href="#events" className="hover:opacity-70 transition-opacity">Listen</a>
           <a href="#ritual" className="hover:opacity-70 transition-opacity">About</a>
         </div>
 
-        <a href="#home" className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${isScrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
-          <span className="text-2xl font-display font-bold tracking-tight text-ink">
+        <button 
+          className={`md:hidden transition-colors duration-500 ${isScrolled || isMobileMenuOpen ? 'text-ink' : 'text-white'}`}
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        <a href="#home" className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+          <span className="text-xl md:text-2xl font-display font-bold tracking-tight text-ink">
             LIT CIGAR LOUNGE
           </span>
         </a>
 
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 md:gap-8">
           <a 
             href="#contact" 
-            className="bg-ink text-white px-6 py-2 text-[11px] uppercase tracking-widest transition-all hover:bg-zinc-800"
+            className="bg-ink text-white px-4 md:px-6 py-2 text-[10px] md:text-[11px] uppercase tracking-widest transition-all hover:bg-zinc-800"
           >
-            Book a Table
+            Book A Section
           </a>
         </div>
       </div>
+
+      {/* Mobile Menu Overlay */}
+      <motion.div 
+        initial={false}
+        animate={isMobileMenuOpen ? { opacity: 1, height: 'auto' } : { opacity: 0, height: 0 }}
+        className="md:hidden overflow-hidden bg-brand/95 backdrop-blur-md border-b border-white/10"
+      >
+        <div className="px-8 py-12 flex flex-col gap-8 text-2xl font-serif text-ink">
+          <a href="#services" onClick={() => setIsMobileMenuOpen(false)}>Drink</a>
+          <a href="#events" onClick={() => setIsMobileMenuOpen(false)}>Listen</a>
+          <a href="#ritual" onClick={() => setIsMobileMenuOpen(false)}>About</a>
+        </div>
+      </motion.div>
     </nav>
   );
 };
@@ -70,18 +91,18 @@ const Hero = () => {
         <div className="absolute inset-0 bg-black/10"></div>
       </div>
 
-      <div className="relative z-10 w-full max-w-[1800px] px-8 text-center">
-        <div className="flex items-center justify-between mb-12 border-b border-white/40 pb-8">
+      <div className="relative z-10 w-full max-w-[1800px] px-6 md:px-8 text-center">
+        <div className="flex flex-col md:flex-row items-center justify-between mb-8 md:mb-12 border-b border-white/40 pb-6 md:pb-8 gap-4 md:gap-0">
+          <div className="hidden md:block flex-1 h-px bg-white/40"></div>
+          <h2 className="text-3xl md:text-5xl font-serif italic text-white px-6 md:px-12">Cigars</h2>
           <div className="flex-1 h-px bg-white/40"></div>
-          <h2 className="text-5xl font-serif italic text-white px-12">Cigars</h2>
+          <h2 className="text-3xl md:text-5xl font-serif italic text-white px-6 md:px-12">Drinks</h2>
           <div className="flex-1 h-px bg-white/40"></div>
-          <h2 className="text-5xl font-serif italic text-white px-12">Drinks</h2>
-          <div className="flex-1 h-px bg-white/40"></div>
-          <h2 className="text-5xl font-serif italic text-white px-12">Live Music</h2>
-          <div className="flex-1 h-px bg-white/40"></div>
+          <h2 className="text-3xl md:text-5xl font-serif italic text-white px-6 md:px-12">Live Music</h2>
+          <div className="hidden md:block flex-1 h-px bg-white/40"></div>
         </div>
 
-        <h1 className="text-[14vw] font-display font-bold leading-[0.8] text-white tracking-tight uppercase drop-shadow-2xl">
+        <h1 className="text-[18vw] md:text-[14vw] font-display font-bold leading-[0.8] text-white tracking-tight uppercase drop-shadow-2xl">
           LIT CIGAR LOUNGE
         </h1>
       </div>
@@ -188,7 +209,7 @@ const Ritual = () => {
           }}
         >
           {duplicatedImages.map((img, i) => (
-            <div key={i} className="min-w-[400px] aspect-[3/4] overflow-hidden">
+            <div key={i} className="min-w-[300px] md:min-w-[400px] aspect-[3/4] overflow-hidden">
               <img 
                 src={img} 
                 alt={`Lounge Detail ${i}`} 
@@ -216,11 +237,11 @@ const Portfolio = () => {
   const duplicatedItems = [...items, ...items];
 
   return (
-    <section id="events" className="py-32 bg-black overflow-hidden">
-      <div className="max-w-[1800px] mx-auto px-8">
-        <div className="flex justify-between items-end mb-20">
-          <h2 className="text-6xl font-serif text-white tracking-tighter uppercase">The Lifestyle</h2>
-          <a href="https://www.instagram.com/litcigarloungepgh/" target="_blank" className="text-white/40 text-[11px] uppercase tracking-[0.3em] hover:text-white transition-colors">
+    <section id="events" className="py-20 md:py-32 bg-black overflow-hidden">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-4 md:gap-0">
+          <h2 className="text-4xl md:text-6xl font-serif text-white tracking-tighter uppercase">The Lifestyle</h2>
+          <a href="https://www.instagram.com/litcigarloungepgh/" target="_blank" className="text-white/40 text-[10px] md:text-[11px] uppercase tracking-[0.3em] hover:text-white transition-colors">
             Follow @litcigarloungepgh
           </a>
         </div>
@@ -228,7 +249,7 @@ const Portfolio = () => {
 
       <div className="relative flex overflow-hidden">
         <motion.div 
-          className="flex gap-8 whitespace-nowrap"
+          className="flex gap-6 md:gap-8 whitespace-nowrap"
           animate={{
             x: ["0%", "-50%"]
           }}
@@ -239,7 +260,7 @@ const Portfolio = () => {
           }}
         >
           {duplicatedItems.map((item, index) => (
-            <div key={index} className="min-w-[500px] group cursor-pointer">
+            <div key={index} className="min-w-[300px] md:min-w-[500px] group cursor-pointer">
               <div className="aspect-[4/5] overflow-hidden mb-6">
                 <img 
                   src={item.img} 
@@ -249,7 +270,7 @@ const Portfolio = () => {
                 />
               </div>
               <span className="text-white/30 text-[10px] uppercase tracking-[0.3em] mb-2 block">{item.category}</span>
-              <h3 className="text-2xl font-serif text-white">{item.title}</h3>
+              <h3 className="text-xl md:text-2xl font-serif text-white">{item.title}</h3>
             </div>
           ))}
         </motion.div>
@@ -269,23 +290,23 @@ const Contact = () => {
 
   return (
     <section id="contact" className="py-20 bg-brand">
-      <div className="max-w-[1800px] mx-auto px-8">
-        <div className="grid lg:grid-cols-2 gap-32">
+      <div className="max-w-[1800px] mx-auto px-6 md:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-32">
           <div>
-            <h2 className="text-7xl font-serif text-ink mb-12 tracking-tighter">Book a Table</h2>
-            <p className="text-ink/70 text-xl font-serif leading-relaxed max-w-md">
+            <h2 className="text-5xl md:text-7xl font-serif text-ink mb-8 md:mb-12 tracking-tighter">Book A Section</h2>
+            <p className="text-ink/70 text-lg md:text-xl font-serif leading-relaxed max-w-md">
               Join us for an evening of sophisticated relaxation. For groups larger than 6, please contact us directly.
             </p>
             
-            <div className="mt-20 space-y-8 text-ink/90 font-serif">
+            <div className="mt-12 md:mt-20 space-y-6 md:space-y-8 text-ink/90 font-serif">
               <div>
-                <h4 className="text-[11px] uppercase tracking-[0.3em] mb-2 opacity-40">Location</h4>
-                <p className="text-2xl">Pittsburgh, PA 15222</p>
+                <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-2 opacity-40">Location</h4>
+                <p className="text-xl md:text-2xl">Pittsburgh, PA 15222</p>
               </div>
               <div>
-                <h4 className="text-[11px] uppercase tracking-[0.3em] mb-2 opacity-40">Hours</h4>
-                <p className="text-2xl">Mon-Thu: 2PM - 11PM</p>
-                <p className="text-2xl">Fri-Sat: 12PM - 1AM</p>
+                <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-2 opacity-40">Hours</h4>
+                <p className="text-xl md:text-2xl">Mon-Thu: 2PM - 11PM</p>
+                <p className="text-xl md:text-2xl">Fri-Sat: 12PM - 1AM</p>
               </div>
             </div>
           </div>
@@ -293,32 +314,32 @@ const Contact = () => {
           <div className="flex flex-col justify-center">
             {formState === 'success' ? (
               <div className="text-center py-20">
-                <h3 className="text-4xl font-serif text-ink mb-4">Confirmed</h3>
+                <h3 className="text-3xl md:text-4xl font-serif text-ink mb-4">Confirmed</h3>
                 <p className="text-ink/60">We look forward to seeing you.</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-12">
+              <form onSubmit={handleSubmit} className="space-y-8 md:space-y-12">
                 <input 
                   required
                   type="text" 
                   placeholder="Full Name"
-                  className="w-full bg-transparent border-b border-ink/20 py-4 text-ink text-2xl font-serif outline-none focus:border-ink transition-colors placeholder:text-ink/20"
+                  className="w-full bg-transparent border-b border-ink/20 py-4 text-ink text-xl md:text-2xl font-serif outline-none focus:border-ink transition-colors placeholder:text-ink/20"
                 />
-                <div className="grid md:grid-cols-2 gap-12">
+                <div className="grid md:grid-cols-2 gap-8 md:gap-12">
                   <input 
                     required
                     type="date" 
-                    className="w-full bg-transparent border-b border-ink/20 py-4 text-ink text-2xl font-serif outline-none focus:border-ink transition-colors"
+                    className="w-full bg-transparent border-b border-ink/20 py-4 text-ink text-xl md:text-2xl font-serif outline-none focus:border-ink transition-colors"
                   />
                   <input 
                     required
                     type="time" 
-                    className="w-full bg-transparent border-b border-ink/20 py-4 text-ink text-2xl font-serif outline-none focus:border-ink transition-colors"
+                    className="w-full bg-transparent border-b border-ink/20 py-4 text-ink text-xl md:text-2xl font-serif outline-none focus:border-ink transition-colors"
                   />
                 </div>
                 <button 
                   disabled={formState === 'submitting'}
-                  className="w-full bg-ink text-white py-6 font-display text-2xl uppercase tracking-widest hover:bg-zinc-800 transition-all disabled:opacity-50"
+                  className="w-full bg-ink text-white py-5 md:py-6 font-display text-xl md:text-2xl uppercase tracking-widest hover:bg-zinc-800 transition-all disabled:opacity-50"
                 >
                   {formState === 'submitting' ? 'Processing...' : 'Request Reservation'}
                 </button>
