@@ -121,8 +121,8 @@ const Services = () => {
     <section id="services" className="relative py-32 overflow-hidden">
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=1920" 
-          alt="Cocktails Background" 
+          src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=1920" 
+          alt="Cocktails Selection Background" 
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
         />
