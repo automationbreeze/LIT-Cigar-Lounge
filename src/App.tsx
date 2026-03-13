@@ -22,7 +22,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => setIsScrolled(window.scrollY > window.innerHeight - 100);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -30,14 +30,14 @@ const Navbar = () => {
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? 'bg-brand/90 backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
       <div className="max-w-[1800px] mx-auto px-8 flex justify-between items-center">
-        <div className="flex gap-8 text-[13px] font-serif text-ink/80">
-          <a href="#services" className="hover:text-ink transition-colors">Drink</a>
-          <a href="#events" className="hover:text-ink transition-colors">Listen</a>
-          <a href="#ritual" className="hover:text-ink transition-colors">About</a>
+        <div className={`flex gap-8 text-[13px] font-serif transition-colors duration-500 ${isScrolled ? 'text-ink/80' : 'text-white'}`}>
+          <a href="#services" className="hover:opacity-70 transition-opacity">Drink</a>
+          <a href="#events" className="hover:opacity-70 transition-opacity">Listen</a>
+          <a href="#ritual" className="hover:opacity-70 transition-opacity">About</a>
         </div>
 
-        <a href="#home" className="absolute left-1/2 -translate-x-1/2">
-          <span className="text-2xl font-display tracking-tighter text-ink">
+        <a href="#home" className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${isScrolled ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+          <span className="text-2xl font-display font-bold tracking-tight text-ink">
             LIT CIGAR LOUNGE
           </span>
         </a>
@@ -57,33 +57,31 @@ const Navbar = () => {
 
 const Hero = () => {
   return (
-    <section id="home" className="relative h-screen flex flex-col justify-end overflow-hidden bg-black">
+    <section id="home" className="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-[#fdf2f4]">
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=1920" 
-          alt="LIT Cigar Lounge Nightlife" 
-          className="w-full h-full object-cover opacity-60"
+          src="https://i.ibb.co/6KYPS6N/Gemini-Generated-Image-aa3y0zaa3y0zaa3y.png" 
+          alt="LIT Cigar Lounge Background" 
+          className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
+          loading="eager"
+          fetchPriority="high"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-black/10"></div>
       </div>
 
-      <div className="relative z-10 w-full px-8 pb-12">
-        <div className="flex items-center justify-between mb-12 border-b border-white/20 pb-8">
-          <div className="flex-1 flex items-center gap-8">
-            <h2 className="text-4xl font-serif italic text-white">Cigars</h2>
-            <div className="flex-1 h-px bg-white/20"></div>
-          </div>
-          <div className="flex-1 flex items-center gap-8 px-12">
-            <h2 className="text-4xl font-serif italic text-white">Cocktails</h2>
-            <div className="flex-1 h-px bg-white/20"></div>
-          </div>
-          <div className="flex-1 flex items-center gap-8">
-            <h2 className="text-4xl font-serif italic text-white">Live Music</h2>
-          </div>
+      <div className="relative z-10 w-full max-w-[1800px] px-8 text-center">
+        <div className="flex items-center justify-between mb-12 border-b border-white/40 pb-8">
+          <div className="flex-1 h-px bg-white/40"></div>
+          <h2 className="text-5xl font-serif italic text-white px-12">Cigars</h2>
+          <div className="flex-1 h-px bg-white/40"></div>
+          <h2 className="text-5xl font-serif italic text-white px-12">Drinks</h2>
+          <div className="flex-1 h-px bg-white/40"></div>
+          <h2 className="text-5xl font-serif italic text-white px-12">Live Music</h2>
+          <div className="flex-1 h-px bg-white/40"></div>
         </div>
 
-        <h1 className="text-[18vw] font-display leading-[0.8] text-white tracking-tighter uppercase">
+        <h1 className="text-[14vw] font-display font-bold leading-[0.8] text-white tracking-tight uppercase drop-shadow-2xl">
           LIT CIGAR LOUNGE
         </h1>
       </div>
@@ -120,8 +118,17 @@ const Services = () => {
   ];
 
   return (
-    <section id="services" className="bg-black py-32">
-      <div className="max-w-[1800px] mx-auto px-8">
+    <section id="services" className="relative py-32 overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=1920" 
+          alt="Cocktails Background" 
+          className="w-full h-full object-cover"
+          referrerPolicy="no-referrer"
+        />
+        <div className="absolute inset-0 bg-black/85 backdrop-blur-[2px]"></div>
+      </div>
+      <div className="relative z-10 max-w-[1800px] mx-auto px-8">
         <div className="grid lg:grid-cols-3 gap-16">
           {categories.map((cat, i) => (
             <div key={i}>
@@ -142,15 +149,6 @@ const Services = () => {
             </div>
           ))}
         </div>
-
-        <div className="mt-32 aspect-[21/9] overflow-hidden">
-          <img 
-            src="https://images.unsplash.com/photo-1574096079513-d8259312b785?auto=format&fit=crop&q=80&w=1920" 
-            alt="LIT Lounge Atmosphere" 
-            className="w-full h-full object-cover"
-            referrerPolicy="no-referrer"
-          />
-        </div>
       </div>
     </section>
   );
@@ -161,8 +159,7 @@ const Ritual = () => {
     "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=800",
     "https://images.unsplash.com/photo-1530103043960-ef38714abb15?auto=format&fit=crop&q=80&w=800",
     "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1574096079513-d8259312b785?auto=format&fit=crop&q=80&w=800"
+    "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=800"
   ];
 
   // Duplicate images for seamless loop
@@ -208,16 +205,18 @@ const Ritual = () => {
 
 const Portfolio = () => {
   const items = [
-    { title: "The Main Lounge", category: "Interior", img: "https://i.ibb.co/hRLwCfvD/image.jpg" },
-    { title: "Premium Selection", category: "Humidor", img: "https://i.ibb.co/7tNWjBRG/image.jpg" },
-    { title: "Evening Atmosphere", category: "Experience", img: "https://i.ibb.co/YFmpZyzC/image.jpg" },
-    { title: "Rare Spirits", category: "Bar", img: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=800" },
-    { title: "Member Events", category: "Community", img: "https://images.unsplash.com/photo-1530103043960-ef38714abb15?auto=format&fit=crop&q=80&w=800" },
-    { title: "Private Lockers", category: "Membership", img: "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?auto=format&fit=crop&q=80&w=800" },
+    { title: "The Main Lounge", category: "Interior", img: "https://images.unsplash.com/photo-1560624052-449f5ddf0c3d?auto=format&fit=crop&q=80&w=800" },
+    { title: "Premium Selection", category: "Humidor", img: "https://images.unsplash.com/photo-1541692640019-b7017a0aef60?auto=format&fit=crop&q=80&w=800" },
+    { title: "Rare Spirits", category: "Bar", img: "https://images.unsplash.com/photo-1569158062233-7dad3b130e55?auto=format&fit=crop&q=80&w=800" },
+    { title: "Evening Jazz", category: "Live Music", img: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=800" },
+    { title: "Craft Cocktails", category: "Mixology", img: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=800" },
   ];
 
+  // Duplicate items for seamless loop
+  const duplicatedItems = [...items, ...items];
+
   return (
-    <section id="events" className="py-32 bg-black">
+    <section id="events" className="py-32 bg-black overflow-hidden">
       <div className="max-w-[1800px] mx-auto px-8">
         <div className="flex justify-between items-end mb-20">
           <h2 className="text-6xl font-serif text-white tracking-tighter uppercase">The Lifestyle</h2>
@@ -225,9 +224,21 @@ const Portfolio = () => {
             Follow @litcigarloungepgh
           </a>
         </div>
+      </div>
 
-        <div className="flex gap-8 overflow-x-auto pb-12 no-scrollbar">
-          {items.map((item, index) => (
+      <div className="relative flex overflow-hidden">
+        <motion.div 
+          className="flex gap-8 whitespace-nowrap"
+          animate={{
+            x: ["0%", "-50%"]
+          }}
+          transition={{
+            duration: 40,
+            ease: "linear",
+            repeat: Infinity
+          }}
+        >
+          {duplicatedItems.map((item, index) => (
             <div key={index} className="min-w-[500px] group cursor-pointer">
               <div className="aspect-[4/5] overflow-hidden mb-6">
                 <img 
@@ -241,7 +252,7 @@ const Portfolio = () => {
               <h3 className="text-2xl font-serif text-white">{item.title}</h3>
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
