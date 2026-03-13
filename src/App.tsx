@@ -157,8 +157,8 @@ const Services = () => {
 const Ritual = () => {
   const images = [
     "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1530103043960-ef38714abb15?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1563298723-dcfebaa392e3?auto=format&fit=crop&q=80&w=800",
+    "https://i.ibb.co/JjpCPDcT/litcigarbar1-1.webp",
+    "https://i.ibb.co/JWVnnWQ1/ligcigarbar2-1.webp",
     "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=800"
   ];
 
@@ -166,11 +166,11 @@ const Ritual = () => {
   const duplicatedImages = [...images, ...images];
 
   return (
-    <section id="ritual" className="bg-brand py-32 overflow-hidden">
+    <section id="ritual" className="bg-brand py-20 overflow-hidden">
       <div className="max-w-[1800px] mx-auto px-8">
-        <div className="max-w-4xl mb-32">
-          <h2 className="text-[6vw] font-serif leading-[1.1] text-ink tracking-tight">
-            A place where every detail is designed to feel warm and intimate, yet infused with a festive energy that builds as the night unfolds.
+        <div className="max-w-5xl mb-16">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif leading-[1.6] text-ink tracking-tight font-light">
+            Lit Cigar Lounge is an upscale destination in Pittsburgh designed for those seeking a sophisticated atmosphere. Located in the Larimer neighborhood, the lounge features a luxury walk-in humidor and a modern environment with comfortable seating and specialized ventilation. In addition to a curated selection, the establishment includes a full-service bar with crafted cocktails and premium spirits, along with a kitchen offering a variety of dining options from small bites to weekend dinners. With a schedule often featuring live jazz and R&B, the lounge provides a polished space for guests to relax and enjoy a premium experience.
           </h2>
         </div>
       </div>
