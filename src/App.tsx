@@ -199,7 +199,7 @@ const Ritual = () => {
       <div className="max-w-[1800px] mx-auto px-8">
         <div className="max-w-5xl mb-16">
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif leading-[1.6] text-ink tracking-tight font-light">
-            Lit Cigar Lounge is an upscale destination in Pittsburgh designed for those seeking a sophisticated atmosphere. Located in the Larimer neighborhood, the lounge features a luxury walk-in humidor and a modern environment with comfortable seating and specialized ventilation. In addition to a curated selection, the establishment includes a full-service bar with crafted cocktails and premium spirits, along with a kitchen offering a variety of dining options from small bites to weekend dinners. With a schedule often featuring live jazz and R&B, the lounge provides a polished space for guests to relax and enjoy a premium experience.
+            Lit Cigar Lounge is an upscale destination in Pittsburgh designed for those seeking a sophisticated atmosphere. Located in the Larimer neighborhood, the multi-leveled lounge features a luxury humidor and a modern environment with comfortable seating and specialized ventilation. In addition to a curated selection, the establishment includes a full-service bar with crafted cocktails and premium spirits, along with a kitchen offering a variety of dining options from small bites to filling dinners. With a schedule often featuring live jazz and R&B, the lounge provides a polished space for guests to relax and enjoy a premium experience.
           </h2>
         </div>
       </div>
@@ -233,55 +233,19 @@ const Ritual = () => {
 };
 
 const Portfolio = () => {
-  const items = [
-    { title: "The Main Lounge", category: "Interior", img: "https://images.unsplash.com/photo-1560624052-449f5ddf0c3d?auto=format&fit=crop&q=80&w=800" },
-    { title: "Premium Selection", category: "Humidor", img: "https://images.unsplash.com/photo-1541692640019-b7017a0aef60?auto=format&fit=crop&q=80&w=800" },
-    { title: "Rare Spirits", category: "Bar", img: "https://images.unsplash.com/photo-1569158062233-7dad3b130e55?auto=format&fit=crop&q=80&w=800" },
-    { title: "Evening Jazz", category: "Live Music", img: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&q=80&w=800" },
-    { title: "Craft Cocktails", category: "Mixology", img: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=800" },
-  ];
-
-  // Duplicate items for seamless loop
-  const duplicatedItems = [...items, ...items];
-
   return (
     <section id="events" className="py-20 md:py-32 bg-black overflow-hidden">
       <div className="max-w-[1800px] mx-auto px-6 md:px-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-4 md:gap-0">
-          <h2 className="text-4xl md:text-6xl font-serif text-white tracking-tighter uppercase">The Lifestyle</h2>
+          <h2 className="text-4xl md:text-6xl font-serif text-white tracking-tighter uppercase">The Latest</h2>
           <a href="https://www.instagram.com/litcigarloungepgh/" target="_blank" className="text-white/40 text-[10px] md:text-[11px] uppercase tracking-[0.3em] hover:text-white transition-colors">
             Follow @litcigarloungepgh
           </a>
         </div>
       </div>
 
-      <div className="relative flex overflow-hidden">
-        <motion.div 
-          className="flex gap-6 md:gap-8 whitespace-nowrap"
-          animate={{
-            x: ["0%", "-50%"]
-          }}
-          transition={{
-            duration: 40,
-            ease: "linear",
-            repeat: Infinity
-          }}
-        >
-          {duplicatedItems.map((item, index) => (
-            <div key={index} className="min-w-[300px] md:min-w-[500px] group cursor-pointer">
-              <div className="aspect-[4/5] overflow-hidden mb-6">
-                <img 
-                  src={item.img} 
-                  alt={item.title} 
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <span className="text-white/30 text-[10px] uppercase tracking-[0.3em] mb-2 block">{item.category}</span>
-              <h3 className="text-xl md:text-2xl font-serif text-white">{item.title}</h3>
-            </div>
-          ))}
-        </motion.div>
+      <div className="max-w-[1800px] mx-auto px-6 md:px-8">
+        <div className="elfsight-app-1b4cc4ee-f3f8-49b5-bc3c-0cec3e73a505" data-elfsight-app-lazy></div>
       </div>
     </section>
   );
