@@ -15,10 +15,11 @@ import {
   Star
 } from 'lucide-react';
 import { useState, useEffect, FormEvent } from 'react';
+import FoodMenu from './FoodMenu';
 
 // --- Components ---
 
-const Navbar = () => {
+const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurrentPage: (page: string) => void }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -28,37 +29,53 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleNavClick = (page: string, hash?: string) => {
+    setCurrentPage(page);
+    setIsMobileMenuOpen(false);
+    if (hash) {
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  };
+
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'bg-brand/95 backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'bg-brand/95 backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
       <div className="max-w-[1800px] mx-auto px-4 md:px-8 flex justify-between items-center relative">
         <div className="flex-none flex justify-start">
-          <div className={`hidden md:flex gap-8 text-[13px] font-serif transition-colors duration-500 ${isScrolled ? 'text-ink/80' : 'text-white'}`}>
-            <a href="#services" className="hover:opacity-70 transition-opacity">Drink</a>
-            <a href="#events" className="hover:opacity-70 transition-opacity">Listen</a>
-            <a href="#ritual" className="hover:opacity-70 transition-opacity">About</a>
+          <div className={`hidden md:flex gap-8 text-[13px] font-serif transition-colors duration-500 ${isScrolled || currentPage !== 'home' ? 'text-ink/80' : 'text-white'}`}>
+            <button onClick={() => handleNavClick('home', '#services')} className="hover:opacity-70 transition-opacity uppercase">Drink</button>
+            <button onClick={() => handleNavClick('food')} className="hover:opacity-70 transition-opacity uppercase">Food</button>
+            <button onClick={() => handleNavClick('home', '#events')} className="hover:opacity-70 transition-opacity uppercase">Listen</button>
+            <button onClick={() => handleNavClick('home', '#ritual')} className="hover:opacity-70 transition-opacity uppercase">About</button>
           </div>
 
           <button 
-            className={`md:hidden transition-colors duration-500 ${isScrolled || isMobileMenuOpen ? 'text-ink' : 'text-white'}`}
+            className={`md:hidden transition-colors duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'text-ink' : 'text-white'}`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
-        <a href="#home" className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${isScrolled || isMobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+        <button onClick={() => handleNavClick('home')} className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
           <span className="text-base sm:text-lg md:text-2xl font-display font-bold tracking-tight text-ink whitespace-nowrap">
             LIT CIGAR LOUNGE
           </span>
-        </a>
+        </button>
 
         <div className="flex-none flex justify-end items-center gap-4 md:gap-8">
-          <a 
-            href="#contact" 
+          <button 
+            onClick={() => handleNavClick('home', '#contact')} 
             className="bg-ink text-white px-3 sm:px-4 md:px-6 py-2 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest transition-all hover:bg-zinc-800 whitespace-nowrap"
           >
             Book A Section
-          </a>
+          </button>
         </div>
       </div>
 
@@ -69,9 +86,10 @@ const Navbar = () => {
         className="md:hidden overflow-hidden bg-brand/95 backdrop-blur-md border-b border-white/10"
       >
         <div className="px-8 py-12 flex flex-col gap-8 text-2xl font-serif text-ink">
-          <a href="#services" onClick={() => setIsMobileMenuOpen(false)}>Drink</a>
-          <a href="#events" onClick={() => setIsMobileMenuOpen(false)}>Listen</a>
-          <a href="#ritual" onClick={() => setIsMobileMenuOpen(false)}>About</a>
+          <button onClick={() => handleNavClick('home', '#services')} className="text-left uppercase">Drink</button>
+          <button onClick={() => handleNavClick('food')} className="text-left uppercase">Food</button>
+          <button onClick={() => handleNavClick('home', '#events')} className="text-left uppercase">Listen</button>
+          <button onClick={() => handleNavClick('home', '#ritual')} className="text-left uppercase">About</button>
         </div>
       </motion.div>
     </nav>
@@ -372,15 +390,23 @@ const Footer = () => {
 // --- Main App ---
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState('home');
+
   return (
     <div className="relative">
-      <Navbar />
+      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
       <main>
-        <Hero />
-        <Services />
-        <Ritual />
-        <Portfolio />
-        <Contact />
+        {currentPage === 'home' ? (
+          <>
+            <Hero />
+            <Services />
+            <Ritual />
+            <Portfolio />
+            <Contact />
+          </>
+        ) : (
+          <FoodMenu />
+        )}
       </main>
       <Footer />
     </div>
