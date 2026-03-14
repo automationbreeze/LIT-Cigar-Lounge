@@ -83,7 +83,7 @@ const Hero = () => {
     <section id="home" className="relative min-h-[100dvh] flex flex-col justify-center items-center overflow-hidden bg-[#fdf2f4]">
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://i.ibb.co/6KYPS6N/Gemini-Generated-Image-aa3y0zaa3y0zaa3y.png" 
+          src="https://i.ibb.co/bRCrTGKH/Gemini-Generated-Image-aa3y0zaa3y0zaa3y-1.webp" 
           alt="LIT Cigar Lounge Background" 
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
