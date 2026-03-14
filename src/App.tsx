@@ -206,7 +206,7 @@ const Ritual = () => {
     "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=800",
     "https://i.ibb.co/JjpCPDcT/litcigarbar1-1.webp",
     "https://i.ibb.co/JWVnnWQ1/ligcigarbar2-1.webp",
-    "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80&w=800"
+    "https://i.ibb.co/KjTQNHVV/Gemini-Generated-Image-hfuac8hfuac8hfua-1.webp"
   ];
 
   // Duplicate images for seamless loop
