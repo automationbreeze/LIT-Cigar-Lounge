@@ -49,10 +49,21 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
       <div className="max-w-[1800px] mx-auto px-4 md:px-8 flex justify-between items-center relative">
         <div className="flex-none flex justify-start">
           <div className={`hidden md:flex gap-8 text-[13px] font-serif transition-colors duration-500 ${isScrolled || currentPage !== 'home' ? 'text-ink/80' : 'text-white'}`}>
-            <button onClick={() => handleNavClick('home', '#services')} className="hover:opacity-70 transition-opacity uppercase">Drink</button>
-            <button onClick={() => handleNavClick('food')} className="hover:opacity-70 transition-opacity uppercase">Food</button>
-            <button onClick={() => handleNavClick('home', '#events')} className="hover:opacity-70 transition-opacity uppercase">Listen</button>
-            <button onClick={() => handleNavClick('home', '#ritual')} className="hover:opacity-70 transition-opacity uppercase">About</button>
+            {[
+              { label: 'Drink', target: '#services' },
+              { label: 'Food', target: 'food', isPage: true },
+              { label: 'Events', target: '#events' },
+              { label: 'About', target: '#ritual' }
+            ].map((item) => (
+              <button 
+                key={item.label}
+                onClick={() => item.isPage ? handleNavClick(item.target) : handleNavClick('home', item.target)} 
+                className="relative group py-1 uppercase tracking-[0.2em] transition-opacity hover:opacity-100"
+              >
+                <span className="relative z-10">{item.label}</span>
+                <span className={`absolute bottom-0 left-0 w-full h-[1px] transition-transform duration-500 origin-right scale-x-0 group-hover:scale-x-100 group-hover:origin-left ${isScrolled || currentPage !== 'home' ? 'bg-ink/40' : 'bg-white/40'}`} />
+              </button>
+            ))}
           </div>
 
           <button 
@@ -88,7 +99,7 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
         <div className="px-8 py-12 flex flex-col gap-8 text-2xl font-serif text-ink">
           <button onClick={() => handleNavClick('home', '#services')} className="text-left uppercase">Drink</button>
           <button onClick={() => handleNavClick('food')} className="text-left uppercase">Food</button>
-          <button onClick={() => handleNavClick('home', '#events')} className="text-left uppercase">Listen</button>
+          <button onClick={() => handleNavClick('home', '#events')} className="text-left uppercase">Events</button>
           <button onClick={() => handleNavClick('home', '#ritual')} className="text-left uppercase">About</button>
         </div>
       </motion.div>
@@ -361,7 +372,7 @@ const Footer = () => {
               <ul className="space-y-4 font-serif text-white/90">
                 <li><a href="#home" className="hover:text-white transition-colors">Home</a></li>
                 <li><a href="#services" className="hover:text-white transition-colors">Drink</a></li>
-                <li><a href="#events" className="hover:text-white transition-colors">Listen</a></li>
+                <li><a href="#events" className="hover:text-white transition-colors">Events</a></li>
                 <li><a href="#ritual" className="hover:text-white transition-colors">About</a></li>
               </ul>
             </div>
