@@ -48,8 +48,8 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'bg-brand/95 backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
       <div className="max-w-[1800px] mx-auto px-4 md:px-8 flex justify-between items-center relative">
-        <div className="flex-none flex justify-start">
-          <div className={`hidden md:flex gap-8 text-[15px] font-serif font-semibold transition-colors duration-500 ${isScrolled || currentPage !== 'home' ? 'text-ink/90' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'}`}>
+        <div className="flex-none md:flex-1 flex justify-start">
+          <div className={`hidden md:flex gap-4 lg:gap-8 text-[12px] lg:text-[15px] font-serif font-semibold transition-colors duration-500 ${isScrolled || currentPage !== 'home' ? 'text-ink/90' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'}`}>
             {[
               { label: 'Drink', target: '#services' },
               { label: 'Food', target: 'food', isPage: true },
@@ -59,7 +59,7 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
               <button 
                 key={item.label}
                 onClick={() => item.isPage ? handleNavClick(item.target) : handleNavClick('home', item.target)} 
-                className="relative group py-1 uppercase tracking-[0.2em] transition-opacity hover:opacity-100"
+                className="relative group py-1 uppercase tracking-[0.2em] transition-opacity hover:opacity-100 whitespace-nowrap"
               >
                 <span className="relative z-10">{item.label}</span>
                 <span className={`absolute bottom-0 left-0 w-full h-[1px] transition-transform duration-500 origin-right scale-x-0 group-hover:scale-x-100 group-hover:origin-left ${isScrolled || currentPage !== 'home' ? 'bg-ink/40' : 'bg-white/40'}`} />
@@ -75,25 +75,25 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
           </button>
         </div>
 
-        <button onClick={() => handleNavClick('home')} className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
-          <span className="text-[13px] min-[375px]:text-[15px] sm:text-lg md:text-2xl font-display font-bold tracking-tight text-ink whitespace-nowrap">
+        <button onClick={() => handleNavClick('home')} className={`absolute md:relative left-1/2 md:left-auto -translate-x-1/2 md:translate-x-0 transition-all duration-500 flex-none mx-2 lg:mx-4 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+          <span className="text-[13px] min-[375px]:text-[15px] sm:text-lg md:text-xl lg:text-2xl font-display font-bold tracking-tight text-ink whitespace-nowrap">
             LIT CIGAR LOUNGE
           </span>
         </button>
 
-        <div className="flex-none flex justify-end items-center gap-3 sm:gap-4 md:gap-8">
+        <div className="flex-none md:flex-1 flex justify-end items-center gap-3 sm:gap-4 lg:gap-8">
           <a 
             href="tel:4124926902" 
             className={`transition-colors duration-500 flex items-center gap-2 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'text-ink hover:text-zinc-800' : 'text-white hover:text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'}`}
           >
             <Phone size={18} className="sm:hidden" />
-            <span className="hidden sm:block text-[11px] md:text-[13px] font-serif font-semibold tracking-wider whitespace-nowrap">
+            <span className="hidden sm:block text-[11px] lg:text-[13px] font-serif font-semibold tracking-wider whitespace-nowrap">
               (412) 492-6902
             </span>
           </a>
           <button 
             onClick={() => handleNavClick('home', '#contact')} 
-            className="bg-ink text-white px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest transition-all hover:bg-zinc-800 whitespace-nowrap"
+            className="bg-ink text-white px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 text-[9px] sm:text-[10px] lg:text-[11px] uppercase tracking-widest transition-all hover:bg-zinc-800 whitespace-nowrap"
           >
             <span className="sm:hidden">Book</span>
             <span className="hidden sm:inline">Book A Section</span>
