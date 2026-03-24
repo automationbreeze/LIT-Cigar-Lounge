@@ -136,13 +136,12 @@ const Hero = () => {
           loop 
           muted 
           playsInline 
-          className="w-full h-full object-cover opacity-90"
+          className="w-full h-full object-cover"
           poster="https://i.ibb.co/bRCrTGKH/Gemini-Generated-Image-aa3y0zaa3y0zaa3y-1.webp"
         >
           <source src="https://res.cloudinary.com/dwsustie8/video/upload/v1774341059/Gen-4_Turbo_Animate_the_tip_of_the_cigar_and_the_smoke_coming_from_it_to_appear_as_though_it_is_a_real_smoking_cigar_1837837253_1_a9qie3.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
-        <div className="absolute inset-0 bg-black/20"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-[1800px] px-4 md:px-8 text-center mt-8 md:mt-0">
