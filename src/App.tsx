@@ -12,9 +12,10 @@ import {
   CheckCircle2,
   Clock,
   ShieldCheck,
-  Star
+  Star,
+  Phone
 } from 'lucide-react';
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent, useRef, MouseEvent } from 'react';
 import FoodMenu from './FoodMenu';
 
 // --- Components ---
@@ -47,8 +48,8 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'bg-brand/95 backdrop-blur-md border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
       <div className="max-w-[1800px] mx-auto px-4 md:px-8 flex justify-between items-center relative">
-        <div className="flex-none flex justify-start">
-          <div className={`hidden md:flex gap-8 text-[13px] font-serif transition-colors duration-500 ${isScrolled || currentPage !== 'home' ? 'text-ink/80' : 'text-white'}`}>
+        <div className="flex-1 flex justify-start">
+          <div className={`hidden md:flex gap-8 text-[15px] font-serif font-semibold transition-colors duration-500 ${isScrolled || currentPage !== 'home' ? 'text-ink/90' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'}`}>
             {[
               { label: 'Drink', target: '#services' },
               { label: 'Food', target: 'food', isPage: true },
@@ -67,23 +68,34 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
           </div>
 
           <button 
-            className={`md:hidden transition-colors duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'text-ink' : 'text-white'}`}
+            className={`md:hidden transition-colors duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'text-ink' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'}`}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
-        <button onClick={() => handleNavClick('home')} className={`absolute left-1/2 -translate-x-1/2 transition-all duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
-          <span className="text-base sm:text-lg md:text-2xl font-display font-bold tracking-tight text-ink whitespace-nowrap">
-            LIT CIGAR LOUNGE
-          </span>
-        </button>
+        <div className="flex-none flex justify-center px-1 sm:px-2">
+          <button onClick={() => handleNavClick('home')} className={`transition-all duration-500 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+            <span className="text-[12px] sm:text-lg md:text-2xl font-display font-bold tracking-tight text-ink whitespace-nowrap">
+              LIT CIGAR LOUNGE
+            </span>
+          </button>
+        </div>
 
-        <div className="flex-none flex justify-end items-center gap-4 md:gap-8">
+        <div className="flex-1 flex justify-end items-center gap-2 sm:gap-4 md:gap-8">
+          <a 
+            href="tel:4124926902" 
+            className={`transition-colors duration-500 flex items-center gap-2 ${isScrolled || isMobileMenuOpen || currentPage !== 'home' ? 'text-ink hover:text-zinc-800' : 'text-white hover:text-white/80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'}`}
+          >
+            <Phone size={16} className="sm:hidden" />
+            <span className="hidden sm:block text-[11px] md:text-[13px] font-serif font-semibold tracking-wider whitespace-nowrap">
+              (412) 492-6902
+            </span>
+          </a>
           <button 
             onClick={() => handleNavClick('home', '#contact')} 
-            className="bg-ink text-white px-3 sm:px-4 md:px-6 py-2 text-[9px] sm:text-[10px] md:text-[11px] uppercase tracking-widest transition-all hover:bg-zinc-800 whitespace-nowrap"
+            className="bg-ink text-white px-2 sm:px-4 md:px-6 py-1.5 sm:py-2 text-[8px] sm:text-[10px] md:text-[11px] uppercase tracking-widest transition-all hover:bg-zinc-800 whitespace-nowrap"
           >
             Book A Section
           </button>
@@ -108,33 +120,45 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
 };
 
 const Hero = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.5;
+    }
+  }, []);
+
   return (
     <section id="home" className="relative min-h-[100dvh] flex flex-col justify-center items-center overflow-hidden bg-[#fdf2f4]">
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://i.ibb.co/bRCrTGKH/Gemini-Generated-Image-aa3y0zaa3y0zaa3y-1.webp" 
-          alt="LIT Cigar Lounge Background" 
-          className="w-full h-full object-cover"
-          referrerPolicy="no-referrer"
-          loading="eager"
-          fetchPriority="high"
-        />
-        <div className="absolute inset-0 bg-black/10"></div>
+        <video 
+          ref={videoRef}
+          autoPlay 
+          loop 
+          muted 
+          playsInline 
+          className="w-full h-full object-cover opacity-90"
+          poster="https://i.ibb.co/bRCrTGKH/Gemini-Generated-Image-aa3y0zaa3y0zaa3y-1.webp"
+        >
+          <source src="https://res.cloudinary.com/dwsustie8/video/upload/v1774341059/Gen-4_Turbo_Animate_the_tip_of_the_cigar_and_the_smoke_coming_from_it_to_appear_as_though_it_is_a_real_smoking_cigar_1837837253_1_a9qie3.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+        <div className="absolute inset-0 bg-black/20"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-[1800px] px-4 md:px-8 text-center mt-8 md:mt-0">
         <div className="grid grid-cols-3 items-center mb-8 md:mb-12 border-b border-white/40 pb-6 md:pb-8 w-full max-w-4xl mx-auto">
           <div className="flex items-center justify-end">
             <div className="hidden md:block flex-1 h-px bg-white/40"></div>
-            <h2 className="text-xl sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Cigars</h2>
+            <h2 className="text-xl sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12 drop-shadow-lg">Cigars</h2>
             <div className="w-6 sm:w-12 md:flex-1 h-px bg-white/40"></div>
           </div>
           <div className="text-center">
-            <h2 className="text-xl sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12">Drinks</h2>
+            <h2 className="text-xl sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12 drop-shadow-lg">Drinks</h2>
           </div>
           <div className="flex items-center justify-start">
             <div className="w-6 sm:w-12 md:flex-1 h-px bg-white/40"></div>
-            <h2 className="text-xl sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12 whitespace-nowrap">Live Music</h2>
+            <h2 className="text-xl sm:text-2xl md:text-5xl font-serif italic text-white px-2 sm:px-6 md:px-12 whitespace-nowrap drop-shadow-lg">Live Music</h2>
             <div className="hidden md:block flex-1 h-px bg-white/40"></div>
           </div>
         </div>
@@ -309,6 +333,10 @@ const Contact = () => {
                 <p className="text-xl md:text-2xl">Mon-Thu: 2PM - 11PM</p>
                 <p className="text-xl md:text-2xl">Fri-Sat: 12PM - 1AM</p>
               </div>
+              <div>
+                <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-2 opacity-40">Phone</h4>
+                <a href="tel:4124926902" className="text-xl md:text-2xl hover:text-ink/70 transition-colors">(412) 492-6902</a>
+              </div>
             </div>
           </div>
 
@@ -353,7 +381,22 @@ const Contact = () => {
   );
 };
 
-const Footer = () => {
+const Footer = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) => {
+  const handleNavClick = (e: MouseEvent, page: string, hash?: string) => {
+    e.preventDefault();
+    setCurrentPage(page);
+    if (hash) {
+      setTimeout(() => {
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  };
+
   return (
     <footer className="bg-black py-16">
       <div className="max-w-[1800px] mx-auto px-8">
@@ -370,17 +413,17 @@ const Footer = () => {
             <div>
               <h4 className="text-[11px] uppercase tracking-[0.3em] text-white/70 mb-8">Navigation</h4>
               <ul className="space-y-4 font-serif text-white/90">
-                <li><a href="#home" className="hover:text-white transition-colors">Home</a></li>
-                <li><a href="#services" className="hover:text-white transition-colors">Drink</a></li>
-                <li><a href="#events" className="hover:text-white transition-colors">Events</a></li>
-                <li><a href="#ritual" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#home" onClick={(e) => handleNavClick(e, 'home')} className="hover:text-white transition-colors">Home</a></li>
+                <li><a href="#services" onClick={(e) => handleNavClick(e, 'home', '#services')} className="hover:text-white transition-colors">Drink</a></li>
+                <li><a href="#events" onClick={(e) => handleNavClick(e, 'home', '#events')} className="hover:text-white transition-colors">Events</a></li>
+                <li><a href="#ritual" onClick={(e) => handleNavClick(e, 'home', '#ritual')} className="hover:text-white transition-colors">About</a></li>
               </ul>
             </div>
             <div>
               <h4 className="text-[11px] uppercase tracking-[0.3em] text-white/70 mb-8">Social</h4>
               <ul className="space-y-4 font-serif text-white/90">
-                <li><a href="#" className="hover:text-white transition-colors">Instagram</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Facebook</a></li>
+                <li><a href="https://www.instagram.com/litcigarloungepgh/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a></li>
+                <li><a href="https://www.facebook.com/p/Lit-Cigar-Lounge-Pgh-61561142032341/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Facebook</a></li>
               </ul>
             </div>
           </div>
@@ -388,10 +431,6 @@ const Footer = () => {
         
         <div className="pt-12 border-t border-white/10 flex justify-between text-[11px] uppercase tracking-[0.3em] text-white/50">
           <p>© 2026 LIT Cigar Lounge Pittsburgh.</p>
-          <div className="flex gap-12">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-          </div>
         </div>
       </div>
     </footer>
@@ -419,7 +458,7 @@ export default function App() {
           <FoodMenu />
         )}
       </main>
-      <Footer />
+      <Footer setCurrentPage={setCurrentPage} />
     </div>
   );
 }
