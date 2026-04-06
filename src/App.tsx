@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import AdminDashboard from './AdminDashboard';
+import EventsPage from './EventsPage';
 import { 
   Flame, 
   Wine, 
@@ -55,7 +56,7 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
             {[
               { label: 'Drink', target: '#services' },
               { label: 'Food', target: 'food', isPage: true },
-              { label: 'Events', target: '#events' },
+              { label: 'Events', target: 'events', isPage: true },
               { label: 'About', target: '#ritual' }
             ].map((item) => (
               <button 
@@ -112,7 +113,7 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
         <div className="px-8 py-12 flex flex-col gap-8 text-2xl font-serif text-ink">
           <button onClick={() => handleNavClick('home', '#services')} className="text-left uppercase">Drink</button>
           <button onClick={() => handleNavClick('food')} className="text-left uppercase">Food</button>
-          <button onClick={() => handleNavClick('home', '#events')} className="text-left uppercase">Events</button>
+          <button onClick={() => handleNavClick('events')} className="text-left uppercase">Events</button>
           <button onClick={() => handleNavClick('home', '#ritual')} className="text-left uppercase">About</button>
         </div>
       </motion.div>
@@ -286,24 +287,21 @@ const Ritual = () => {
 };
 
 const Portfolio = () => {
-  const [images, setImages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    const fetchGallery = async () => {
-      try {
-        const res = await fetch('/api/gallery');
-        if (res.ok) {
-          const data = await res.json();
-          setImages(data);
-        }
-      } catch (error) {
-        console.error('Failed to fetch gallery:', error);
-      } finally {
-        setLoading(false);
+    const existingScript = document.querySelector('script[src="https://elfsightcdn.com/platform.js"]');
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.src = "https://elfsightcdn.com/platform.js";
+      script.async = true;
+      document.body.appendChild(script);
+    }
+    return () => {
+      // Cleanup script on unmount safely
+      const scriptToRemove = document.querySelector('script[src="https://elfsightcdn.com/platform.js"]');
+      if (scriptToRemove && scriptToRemove.parentNode) {
+        scriptToRemove.parentNode.removeChild(scriptToRemove);
       }
     };
-    fetchGallery();
   }, []);
 
   return (
@@ -318,24 +316,8 @@ const Portfolio = () => {
       </div>
 
       <div className="max-w-[1800px] mx-auto px-6 md:px-8">
-        {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {images.map((img, i) => (
-              <div key={img.public_id || i} className="aspect-square overflow-hidden bg-white/5 relative group">
-                <img 
-                  src={img.secure_url} 
-                  alt={`Gallery image ${i}`} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-            ))}
-          </div>
-        )}
+        {/* Elfsight Instagram Feed | Lit Cigar Lounge IG Widget */}
+        <div className="elfsight-app-1b4cc4ee-f3f8-49b5-bc3c-0cec3e73a505" data-elfsight-app-lazy></div>
       </div>
     </section>
   );
@@ -492,8 +474,10 @@ function MainApp() {
             <Portfolio />
             <Contact />
           </>
-        ) : (
+        ) : currentPage === 'food' ? (
           <FoodMenu />
+        ) : (
+          <EventsPage />
         )}
       </main>
       <Footer setCurrentPage={setCurrentPage} />

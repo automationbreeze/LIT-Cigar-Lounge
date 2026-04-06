@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, Trash2, UserPlus, LogOut, Image as ImageIcon, Shield, Loader2, Home } from 'lucide-react';
+import { Upload, Trash2, UserPlus, LogOut, Image as ImageIcon, Shield, Loader2, Home, Play } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
@@ -23,21 +23,114 @@ export default function AdminDashboard() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<{ type: 'success' | 'error', message: string, details?: string } | null>(null);
+  const [gallery, setGallery] = useState<any[]>([]);
+  const [isGalleryLoading, setIsGalleryLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     checkAuth();
+    fetchGallery();
   }, []);
+
+  const fetchGallery = async () => {
+    setIsGalleryLoading(true);
+    try {
+      const res = await fetch('/api/gallery', {
+        credentials: 'include'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setGallery(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch gallery:', error);
+    } finally {
+      setIsGalleryLoading(false);
+    }
+  };
+
+  const handleDeleteMedia = async (publicId: string, resourceType: string) => {
+    if (!confirm('Are you sure you want to delete this item?')) return;
+    
+    try {
+      const res = await fetch(`/api/gallery/${encodeURIComponent(publicId)}?type=${resourceType}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      
+      if (res.ok) {
+        setUploadStatus({ type: 'success', message: 'Item deleted successfully' });
+        setTimeout(() => {
+          fetchGallery();
+          setUploadStatus(null);
+        }, 1500);
+      } else {
+        const data = await res.json();
+        setUploadStatus({ type: 'error', message: data.error || 'Failed to delete media' });
+        setTimeout(() => setUploadStatus(null), 3000);
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      setUploadStatus({ type: 'error', message: 'An error occurred' });
+      setTimeout(() => setUploadStatus(null), 3000);
+    }
+  };
+
+  const [configStatus, setConfigStatus] = useState<{ cloudinary: boolean; admin: boolean } | null>(null);
+
+  const [isTestingCloudinary, setIsTestingCloudinary] = useState(false);
+
+  const testCloudinary = async () => {
+    setIsTestingCloudinary(true);
+    try {
+      const res = await fetch('/api/test-cloudinary', { credentials: 'include' });
+      const data = await res.json();
+      if (res.ok) {
+        setUploadStatus({ 
+          type: 'success', 
+          message: data.message || 'Cloudinary connection successful!',
+          details: data.details
+        });
+      } else {
+        setUploadStatus({ 
+          type: 'error', 
+          message: `Cloudinary test failed: ${data.error}`,
+          details: `${data.details || ''} ${data.http_code ? `(HTTP ${data.http_code})` : ''} ${data.help || ''}`.trim()
+        });
+      }
+    } catch (error: any) {
+      setUploadStatus({ type: 'error', message: `Connection error: ${error.message}` });
+    } finally {
+      setIsTestingCloudinary(false);
+      setTimeout(() => setUploadStatus(null), 5000);
+    }
+  };
+
+  const checkConfig = async () => {
+    try {
+      const res = await fetch('/api/config-status', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        setConfigStatus(data);
+      }
+    } catch (error) {
+      console.error('Failed to check config status:', error);
+    }
+  };
 
   const checkAuth = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/check-auth');
+      const res = await fetch('/api/check-auth', {
+        credentials: 'include'
+      });
       if (res.ok) {
         const data = await res.json();
         setIsAuthenticated(true);
         setCurrentUser(data.user);
         fetchAdmins();
+        checkConfig(); // Check config status after login
       } else {
         setIsAuthenticated(false);
       }
@@ -56,6 +149,7 @@ export default function AdminDashboard() {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email, password })
       });
       if (res.ok) {
@@ -79,7 +173,9 @@ export default function AdminDashboard() {
   };
 
   const fetchAdmins = async () => {
-    const res = await fetch('/api/admins');
+    const res = await fetch('/api/admins', {
+      credentials: 'include'
+    });
     if (res.ok) {
       const data = await res.json();
       setAdmins(data);
@@ -93,6 +189,7 @@ export default function AdminDashboard() {
       const res = await fetch('/api/admins/add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: newAdminEmail, password: newAdminPassword })
       });
       if (res.ok) {
@@ -116,6 +213,7 @@ export default function AdminDashboard() {
       const res = await fetch('/api/admins/remove', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: adminEmail })
       });
       if (res.ok) {
@@ -130,16 +228,19 @@ export default function AdminDashboard() {
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       uploadFiles(e.dataTransfer.files);
@@ -161,39 +262,47 @@ export default function AdminDashboard() {
     }
 
     try {
-      // Using XMLHttpRequest to track progress
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', '/api/upload', true);
-      
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percentComplete = Math.round((event.loaded / event.total) * 100);
-          setUploadProgress(percentComplete);
-        }
-      };
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
 
-      xhr.onload = () => {
-        if (xhr.status === 200) {
-          alert('Upload successful!');
-        } else {
-          alert('Upload failed');
-        }
-        setIsUploading(false);
-        setUploadProgress(0);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-      };
+      const contentType = res.headers.get('content-type');
+      let data;
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(`Server returned non-JSON response (${res.status}): ${text.substring(0, 100)}`);
+      }
 
-      xhr.onerror = () => {
-        alert('Upload failed');
-        setIsUploading(false);
-        setUploadProgress(0);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-      };
-
-      xhr.send(formData);
-    } catch (error) {
-      alert('An error occurred during upload');
+      if (res.ok) {
+        setUploadStatus({ type: 'success', message: 'Upload successful!' });
+        setTimeout(() => {
+          fetchGallery();
+          setUploadStatus(null);
+        }, 2000);
+      } else {
+        setUploadStatus({ 
+          type: 'error', 
+          message: data.error || 'Upload failed',
+          details: data.details
+        });
+        setTimeout(() => setUploadStatus(null), 10000);
+      }
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      setUploadStatus({ 
+        type: 'error', 
+        message: 'Upload failed: Server error',
+        details: error.message
+      });
+      setTimeout(() => setUploadStatus(null), 15000);
+    } finally {
       setIsUploading(false);
+      setUploadProgress(0);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -292,6 +401,43 @@ export default function AdminDashboard() {
       </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Config Status */}
+        {configStatus && (
+          <div className="mb-8 p-4 bg-white rounded-xl shadow-sm border border-gray-200 flex items-center justify-between">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${configStatus.cloudinary ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Cloudinary</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${configStatus.admin ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Admin Auth</span>
+              </div>
+            </div>
+            {!configStatus.cloudinary && (
+              <div className="flex items-center gap-4">
+                <p className="text-[10px] text-red-600 font-bold uppercase tracking-widest">Action Required: Configure Cloudinary in Settings</p>
+                <button 
+                  onClick={testCloudinary}
+                  disabled={isTestingCloudinary}
+                  className="text-[10px] bg-red-600 text-white px-2 py-1 rounded-sm hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {isTestingCloudinary ? 'Testing...' : 'Test Connection'}
+                </button>
+              </div>
+            )}
+            {configStatus.cloudinary && (
+              <button 
+                onClick={testCloudinary}
+                disabled={isTestingCloudinary}
+                className="text-[10px] bg-gray-900 text-white px-2 py-1 rounded-sm hover:bg-black transition-colors disabled:opacity-50"
+              >
+                {isTestingCloudinary ? 'Testing...' : 'Test Connection'}
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* Media Upload Section */}
@@ -320,7 +466,10 @@ export default function AdminDashboard() {
               />
               <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 font-medium">Click or drag files to upload</p>
-              <p className="text-gray-400 text-sm mt-2">Supports multiple images and videos</p>
+              <p className="text-gray-400 text-xs mt-2">
+                Images (JPG, PNG, WEBP) & Videos (MP4, MOV)<br />
+                Max 100MB per file
+              </p>
             </div>
 
             {isUploading && (
@@ -334,6 +483,19 @@ export default function AdminDashboard() {
                     className="bg-gray-900 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   ></div>
+                </div>
+              </div>
+            )}
+
+            {uploadStatus && (
+              <div className={`mt-4 p-3 rounded-lg text-sm font-medium ${
+                uploadStatus.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
+              }`}>
+                <div className="flex flex-col gap-1">
+                  <span>{uploadStatus.message}</span>
+                  {uploadStatus.details && (
+                    <span className="text-[10px] font-mono opacity-80 break-all">{uploadStatus.details}</span>
+                  )}
                 </div>
               </div>
             )}
@@ -401,6 +563,70 @@ export default function AdminDashboard() {
             </div>
           </div>
 
+        </div>
+
+        {/* Gallery Preview Section */}
+        <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-gray-900" />
+              <h2 className="text-lg font-bold text-gray-900">Gallery Preview</h2>
+            </div>
+            <button 
+              onClick={fetchGallery}
+              className="text-sm text-gray-500 hover:text-gray-900 underline"
+            >
+              Refresh
+            </button>
+          </div>
+
+          {isGalleryLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {gallery.length > 0 ? (
+                gallery.map((item, i) => (
+                  <div key={item.public_id || i} className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative group">
+                    {item.resource_type === 'video' ? (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-900">
+                        <Play className="w-8 h-8 text-white/20" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                            <Play className="w-4 h-4 text-white fill-white" />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <img 
+                        src={item.secure_url} 
+                        alt="Gallery preview" 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    )}
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteMedia(item.public_id, item.resource_type);
+                      }}
+                      className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 z-10 shadow-lg"
+                      title="Delete Media"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full py-12 text-center text-gray-400 font-serif italic">
+                  No media found in gallery.
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
     </div>

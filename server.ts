@@ -9,18 +9,42 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import os from 'os';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.json());
+// Request logging
+app.use((req, res, next) => {
+  if (!req.path.startsWith('/@vite') && !req.path.startsWith('/src')) {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  }
+  next();
+});
+
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 app.use(cookieParser());
 
-// Setup Data Directory
+// Setup Data and Upload Directories
 const dataDir = path.join(__dirname, 'data');
+const uploadDir = path.join(os.tmpdir(), 'lit-lounge-uploads');
+
 if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir);
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Ensure upload directory is writable
+try {
+  fs.accessSync(uploadDir, fs.constants.W_OK);
+  console.log('Upload directory is writable');
+} catch (err) {
+  console.error('Upload directory is NOT writable:', err);
 }
 
 const adminsFile = path.join(dataDir, 'admins.json');
@@ -54,7 +78,7 @@ const authenticate = (req: express.Request, res: express.Response, next: express
   console.log('Authenticate middleware reached for', req.path);
   const token = req.cookies.token;
   if (!token) {
-    console.log('No token found');
+    console.log('No token found in cookies. Available cookies:', Object.keys(req.cookies));
     return res.status(401).json({ error: 'Unauthorized' });
   }
   try {
@@ -84,7 +108,12 @@ app.post('/api/login', async (req, res) => {
   }
   
   const token = jwt.sign({ email: admin.email }, JWT_SECRET, { expiresIn: '1d' });
-  res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
+  res.cookie('token', token, { 
+    httpOnly: true, 
+    secure: true, // Always use secure if possible
+    sameSite: 'none', // Allow cross-site if needed (e.g. in an iframe)
+    maxAge: 24 * 60 * 60 * 1000 
+  });
   res.json({ message: 'Logged in successfully', email: admin.email });
 });
 
@@ -96,6 +125,55 @@ app.post('/api/logout', (req, res) => {
 app.get('/api/check-auth', authenticate, (req, res) => {
   console.log('GET /api/check-auth reached');
   res.json({ authenticated: true, user: (req as any).user });
+});
+
+app.get('/api/config-status', authenticate, (req, res) => {
+  res.json({
+    cloudinary: !!(process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET),
+    admin: !!(process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD && process.env.JWT_SECRET)
+  });
+});
+
+app.get('/api/test-cloudinary', authenticate, async (req, res) => {
+  try {
+    const config = {
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME?.trim(),
+      api_key: process.env.CLOUDINARY_API_KEY ? '***' + process.env.CLOUDINARY_API_KEY.trim().slice(-4) : 'Missing',
+      api_secret: process.env.CLOUDINARY_API_SECRET ? 'Present' : 'Missing'
+    };
+
+    if (!config.cloud_name || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      return res.status(500).json({ error: 'Missing credentials', config });
+    }
+
+    console.log('Testing Cloudinary connectivity...');
+    await cloudinary.api.ping();
+    
+    console.log('Testing Cloudinary Admin API (Usage)...');
+    const usage = await cloudinary.api.usage();
+    
+    console.log('Testing Cloudinary Upload API (Small test image)...');
+    const testUpload = await cloudinary.uploader.upload('data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', {
+      folder: 'test_connection',
+      public_id: 'test_ping_' + Date.now(),
+      resource_type: 'image'
+    });
+    
+    res.json({ 
+      status: 'ok', 
+      message: 'Connection, Admin API, and Upload API verified!',
+      details: `Plan: ${usage.plan}. Objects: ${usage.objects.used}/${usage.objects.limit}. Test Upload ID: ${testUpload.public_id}`,
+      cloud_name: config.cloud_name
+    });
+  } catch (error: any) {
+    console.error('Cloudinary test failed:', error);
+    res.status(500).json({ 
+      error: 'Cloudinary test failed', 
+      details: error.message,
+      http_code: error.http_code,
+      help: 'A 403 error usually means your API Key or Secret is incorrect for this Cloud Name, or your account has restrictions. Please double check them in Cloudinary Dashboard.'
+    });
+  }
 });
 
 app.get('/api/admins', authenticate, (req, res) => {
@@ -140,63 +218,193 @@ app.post('/api/admins/remove', authenticate, (req, res) => {
 });
 
 // Cloudinary Setup
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
+const cloudinaryConfig = {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME?.trim(),
+  api_key: process.env.CLOUDINARY_API_KEY?.trim(),
+  api_secret: process.env.CLOUDINARY_API_SECRET?.trim()
+};
+
+console.log('Configuring Cloudinary with:', {
+  cloud_name: cloudinaryConfig.cloud_name,
+  api_key: cloudinaryConfig.api_key ? 'Present' : 'Missing',
+  api_secret: cloudinaryConfig.api_secret ? 'Present' : 'Missing'
 });
 
-const upload = multer({ dest: 'uploads/' });
+cloudinary.config(cloudinaryConfig);
 
-app.post('/api/upload', authenticate, upload.array('files', 20), async (req, res) => {
+// Use the existing uploadDir defined at the top
+const upload = multer({ 
+  dest: uploadDir,
+  limits: {
+    fileSize: 100 * 1024 * 1024, // 100MB
+    files: 20
+  }
+});
+
+app.post('/api/upload', authenticate, (req, res, next) => {
+  console.log('Upload request received');
+  upload.array('files', 20)(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      console.error('Multer Error:', err);
+      return res.status(400).json({ error: 'Upload Error', details: err.message });
+    } else if (err) {
+      console.error('Multer Unknown Error:', err);
+      return res.status(500).json({ error: 'Upload Error', details: err.message });
+    }
+    console.log('Multer upload successful, moving to Cloudinary...');
+    next();
+  });
+}, async (req, res) => {
+  console.log('Main upload handler reached. Files count:', (req.files as any)?.length);
   try {
     const files = req.files as Express.Multer.File[];
     if (!files || files.length === 0) {
+      console.log('No files in request');
       return res.status(400).json({ error: 'No files uploaded' });
     }
 
-    const uploadPromises = files.map(file => {
-      return cloudinary.uploader.upload(file.path, {
-        folder: 'gallery'
-      }).finally(() => {
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      console.log('Missing Cloudinary credentials');
+      return res.status(500).json({ 
+        error: 'Cloudinary Configuration Error', 
+        details: 'Cloudinary credentials are missing in environment.' 
+      });
+    }
+
+    console.log(`Starting upload of ${files.length} files to Cloudinary...`);
+
+    const uploadPromises = files.map(async (file) => {
+      try {
+        console.log(`Uploading file: ${file.originalname} (${file.size} bytes, ${file.mimetype})`);
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: 'gallery',
+          resource_type: 'auto',
+          use_filename: true,
+          unique_filename: true,
+          chunk_size: 6000000 // 6MB chunks for better video handling
+        });
+        console.log(`Successfully uploaded ${file.originalname} to Cloudinary as ${result.public_id}`);
+        return result;
+      } catch (uploadError: any) {
+        console.error(`Cloudinary upload failed for ${file.originalname}:`, uploadError.message);
+        const code = (uploadError as any).http_code || 'N/A';
+        throw new Error(`Cloudinary Error for ${file.originalname}: ${uploadError.message} (HTTP ${code})`);
+      } finally {
         // Clean up local file
         if (fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
+          try {
+            fs.unlinkSync(file.path);
+          } catch (unlinkError) {
+            console.error(`Failed to delete temp file ${file.path}:`, unlinkError);
+          }
         }
-      });
+      }
     });
 
     const results = await Promise.all(uploadPromises);
-    res.json({ message: 'Upload successful', results });
-  } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: 'Upload failed' });
+    const simplifiedResults = results.map((r: any) => ({
+      public_id: r.public_id,
+      secure_url: r.secure_url,
+      resource_type: r.resource_type
+    }));
+    
+    console.log('Upload successful. Sending response.');
+    res.json({ message: 'Upload successful', results: simplifiedResults });
+  } catch (error: any) {
+    console.error('Upload process error:', error);
+    res.status(500).json({ 
+      error: 'Upload failed', 
+      details: error.message || 'Unknown server error'
+    });
   }
 });
 
 app.get('/api/gallery', async (req, res) => {
   try {
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      console.warn('Cloudinary credentials missing, using mock data');
       throw new Error('Cloudinary credentials missing');
     }
     
-    const result = await cloudinary.search
-      .expression('folder:gallery')
-      .sort_by('created_at', 'desc')
-      .max_results(30)
-      .execute();
+    console.log('Fetching gallery from Cloudinary...');
+    
+    try {
+      // Try Search API first (most efficient for mixed media)
+      const result = await cloudinary.search
+        .expression('folder:gallery')
+        .sort_by('created_at', 'desc')
+        .max_results(30)
+        .execute();
       
-    res.json(result.resources);
+      console.log(`Search API returned ${result.resources.length} resources`);
+      return res.json(result.resources);
+    } catch (searchError: any) {
+      console.warn('Cloudinary Search API failed, falling back to Admin API:', searchError.message);
+      
+      // Fallback to Admin API (more reliable but requires multiple calls for mixed media)
+      const [images, videos] = await Promise.all([
+        cloudinary.api.resources({ type: 'upload', prefix: 'gallery/', resource_type: 'image', max_results: 30 }),
+        cloudinary.api.resources({ type: 'upload', prefix: 'gallery/', resource_type: 'video', max_results: 30 })
+      ]);
+      
+      const combined = [...images.resources, ...videos.resources]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      
+      console.log(`Admin API returned ${combined.length} resources`);
+      return res.json(combined);
+    }
   } catch (error) {
     console.error('Gallery fetch error:', error);
-    // Graceful fallback
+    // Graceful fallback with mock data
     res.json([
-      { secure_url: 'https://picsum.photos/seed/gallery1/800/600', public_id: 'mock1' },
-      { secure_url: 'https://picsum.photos/seed/gallery2/800/600', public_id: 'mock2' },
-      { secure_url: 'https://picsum.photos/seed/gallery3/800/600', public_id: 'mock3' },
-      { secure_url: 'https://picsum.photos/seed/gallery4/800/600', public_id: 'mock4' }
+      { secure_url: 'https://picsum.photos/seed/gallery1/800/600', public_id: 'mock1', resource_type: 'image' },
+      { secure_url: 'https://picsum.photos/seed/gallery2/800/600', public_id: 'mock2', resource_type: 'image' },
+      { secure_url: 'https://picsum.photos/seed/gallery3/800/600', public_id: 'mock3', resource_type: 'image' },
+      { secure_url: 'https://picsum.photos/seed/gallery4/800/600', public_id: 'mock4', resource_type: 'image' }
     ]);
   }
+});
+
+app.delete('/api/gallery/:publicId(*)', authenticate, async (req, res) => {
+  try {
+    const { publicId } = req.params;
+    const resourceType = req.query.type as string || 'image';
+    
+    console.log(`Deleting resource ${publicId} of type ${resourceType}`);
+    
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType
+    });
+    
+    if (result.result === 'ok' || result.result === 'not found') {
+      res.json({ message: 'Resource deleted successfully', result: result.result });
+    } else {
+      console.error('Cloudinary delete error:', result);
+      res.status(400).json({ error: 'Failed to delete resource', details: result });
+    }
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({ error: 'Delete failed' });
+  }
+});
+
+// API Catch-all (to prevent SPA fallback for missing API routes)
+app.all('/api/*', (req, res) => {
+  console.log(`404 API Route Not Found: ${req.method} ${req.path}`);
+  res.status(404).json({ 
+    error: 'API route not found', 
+    path: req.path, 
+    method: req.method 
+  });
+});
+
+// Global Error Handler (Must be last)
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Unhandled error:', err);
+  res.status(err.status || 500).json({
+    error: 'Server error',
+    details: err.message || 'An unexpected error occurred'
+  });
 });
 
 async function startServer() {
