@@ -1,4 +1,6 @@
 import { motion } from 'motion/react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import AdminDashboard from './AdminDashboard';
 import { 
   Flame, 
   Wine, 
@@ -284,6 +286,26 @@ const Ritual = () => {
 };
 
 const Portfolio = () => {
+  const [images, setImages] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const res = await fetch('/api/gallery');
+        if (res.ok) {
+          const data = await res.json();
+          setImages(data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch gallery:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGallery();
+  }, []);
+
   return (
     <section id="events" className="py-20 md:py-32 bg-black overflow-hidden">
       <div className="max-w-[1800px] mx-auto px-6 md:px-8">
@@ -296,7 +318,24 @@ const Portfolio = () => {
       </div>
 
       <div className="max-w-[1800px] mx-auto px-6 md:px-8">
-        <div className="elfsight-app-1b4cc4ee-f3f8-49b5-bc3c-0cec3e73a505" data-elfsight-app-lazy></div>
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <div className="w-8 h-8 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {images.map((img, i) => (
+              <div key={img.public_id || i} className="aspect-square overflow-hidden bg-white/5 relative group">
+                <img 
+                  src={img.secure_url} 
+                  alt={`Gallery image ${i}`} 
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -427,8 +466,9 @@ const Footer = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) 
           </div>
         </div>
         
-        <div className="pt-12 border-t border-white/10 flex justify-between text-[11px] uppercase tracking-[0.3em] text-white/50">
+        <div className="pt-12 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] uppercase tracking-[0.3em] text-white/50">
           <p>© 2026 LIT Cigar Lounge Pittsburgh.</p>
+          <Link to="/admin" className="hover:text-white transition-colors">Admin Portal</Link>
         </div>
       </div>
     </footer>
@@ -437,7 +477,7 @@ const Footer = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) 
 
 // --- Main App ---
 
-export default function App() {
+function MainApp() {
   const [currentPage, setCurrentPage] = useState('home');
 
   return (
@@ -458,5 +498,16 @@ export default function App() {
       </main>
       <Footer setCurrentPage={setCurrentPage} />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainApp />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+      </Routes>
+    </Router>
   );
 }
