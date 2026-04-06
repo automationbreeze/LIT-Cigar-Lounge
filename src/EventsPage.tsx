@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Calendar, Instagram, Play, X } from 'lucide-react';
+import { Calendar, Instagram, Play, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface MediaItem {
   public_id: string;
@@ -15,6 +15,24 @@ export default function EventsPage() {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(8);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1280) setItemsPerPage(8); // xl: 4 cols * 2 rows
+      else if (window.innerWidth >= 1024) setItemsPerPage(6); // lg: 3 cols * 2 rows
+      else if (window.innerWidth >= 640) setItemsPerPage(4); // sm: 2 cols * 2 rows
+      else setItemsPerPage(2); // mobile: 1 col * 2 rows
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const totalPages = Math.ceil(media.length / itemsPerPage);
+  const paginatedMedia = media.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const fetchGallery = async (isRefresh = false) => {
     if (isRefresh) setLoading(true);
@@ -59,15 +77,6 @@ export default function EventsPage() {
               A visual chronicle of the exceptional gatherings, private tastings, and unforgettable evenings at LIT Cigar Lounge. 
             </p>
           </div>
-          
-          <button 
-            onClick={() => fetchGallery(true)}
-            disabled={loading}
-            className="text-[10px] uppercase tracking-[0.3em] text-ink/40 hover:text-ink transition-colors flex items-center gap-2 group disabled:opacity-50"
-          >
-            <div className={`w-1.5 h-1.5 rounded-full bg-ink/20 group-hover:bg-ink transition-colors ${loading ? 'animate-pulse' : ''}`} />
-            {loading ? 'Refreshing...' : 'Refresh Gallery'}
-          </button>
         </motion.div>
       </section>
 
@@ -89,8 +98,8 @@ export default function EventsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
-            {media.length > 0 ? (
-              media.map((item, i) => (
+            {paginatedMedia.length > 0 ? (
+              paginatedMedia.map((item, i) => (
                 <motion.div
                   key={item.public_id || i}
                   initial={{ opacity: 0, scale: 0.95 }}
@@ -103,7 +112,7 @@ export default function EventsPage() {
                     <div className="w-full h-full relative">
                       <video 
                         src={item.secure_url} 
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                        className="w-full h-full object-cover transition-all duration-700"
                         muted
                         playsInline
                         onMouseOver={(e) => {
@@ -116,7 +125,7 @@ export default function EventsPage() {
                           v.currentTime = 0;
                         }}
                       />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-transparent transition-colors">
                         <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
                           <Play className="w-5 h-5 text-white fill-white" />
                         </div>
@@ -126,18 +135,10 @@ export default function EventsPage() {
                     <img 
                       src={item.secure_url} 
                       alt={`Event moment ${i}`}
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110"
                       referrerPolicy="no-referrer"
                     />
                   )}
-                  
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-6">
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-white/60 mb-1 font-serif">
-                      {item.resource_type === 'video' ? 'Video' : 'Photography'}
-                    </span>
-                    <div className="h-[1px] w-8 bg-white/30 mb-2" />
-                  </div>
                 </motion.div>
               ))
             ) : (
@@ -146,6 +147,43 @@ export default function EventsPage() {
                 <p className="text-ink/40 font-serif italic">No moments captured yet. Check back soon.</p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-8 mt-16">
+            <button
+              onClick={() => {
+                setCurrentPage(prev => Math.max(1, prev - 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              disabled={currentPage === 1}
+              className="p-4 rounded-full border border-ink/10 text-ink/40 hover:text-ink hover:border-ink/30 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronLeft size={24} />
+            </button>
+            
+            <div className="flex items-center gap-4">
+              <span className="text-[11px] uppercase tracking-[0.4em] text-ink font-serif font-bold">
+                Page {currentPage}
+              </span>
+              <span className="text-ink/20 font-serif italic">of</span>
+              <span className="text-[11px] uppercase tracking-[0.4em] text-ink/40 font-serif">
+                {totalPages}
+              </span>
+            </div>
+
+            <button
+              onClick={() => {
+                setCurrentPage(prev => Math.min(totalPages, prev + 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              disabled={currentPage === totalPages}
+              className="p-4 rounded-full border border-ink/10 text-ink/40 hover:text-ink hover:border-ink/30 disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+            >
+              <ChevronRight size={24} />
+            </button>
           </div>
         )}
       </section>
