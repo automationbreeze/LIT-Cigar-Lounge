@@ -274,21 +274,26 @@ apiRouter.post('/admins/add', authenticate, async (req, res) => {
 
 apiRouter.post('/admins/remove', authenticate, (req, res) => {
   const { email } = req.body;
-  const currentUserEmail = (req as any).user.email;
+  if (!email) return res.status(400).json({ error: 'Email required' });
   
-  if (email === currentUserEmail) {
+  const currentUserEmail = (req as any).user.email.toLowerCase().trim();
+  const targetEmail = email.toLowerCase().trim();
+  
+  if (targetEmail === currentUserEmail) {
     return res.status(400).json({ error: 'Cannot remove yourself' });
   }
   
   let admins = getAdmins();
   const initialLength = admins.length;
-  admins = admins.filter((a: any) => a.email !== email);
+  admins = admins.filter((a: any) => a.email.toLowerCase().trim() !== targetEmail);
   
   if (admins.length === initialLength) {
+    console.log(`Admin removal failed: ${targetEmail} not found in list of ${initialLength} admins`);
     return res.status(404).json({ error: 'Admin not found' });
   }
   
   saveAdmins(admins);
+  console.log(`Admin removed successfully: ${targetEmail}`);
   res.json({ message: 'Admin removed successfully' });
 });
 

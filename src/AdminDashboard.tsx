@@ -18,6 +18,8 @@ export default function AdminDashboard() {
   const [newAdminEmail, setNewAdminEmail] = useState('');
   const [newAdminPassword, setNewAdminPassword] = useState('');
   const [adminError, setAdminError] = useState('');
+  const [deletingEmail, setDeletingEmail] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   // Upload State
   const [isDragging, setIsDragging] = useState(false);
@@ -237,8 +239,17 @@ export default function AdminDashboard() {
 
   const handleRemoveAdmin = async (adminEmail: string) => {
     if (adminEmail === currentUser?.email) return;
-    if (!confirm(`Are you sure you want to remove ${adminEmail}?`)) return;
     
+    // If they haven't clicked once to confirm, set the confirm state
+    if (confirmDelete !== adminEmail) {
+      setConfirmDelete(adminEmail);
+      // Reset confirmation after 3 seconds if they don't click again
+      setTimeout(() => setConfirmDelete(null), 3000);
+      return;
+    }
+    
+    setDeletingEmail(adminEmail);
+    setAdminError('');
     try {
       const res = await fetch('/api/admins/remove', {
         method: 'POST',
@@ -246,13 +257,20 @@ export default function AdminDashboard() {
         credentials: 'include',
         body: JSON.stringify({ email: adminEmail })
       });
+      
       if (res.ok) {
+        setUploadStatus({ type: 'success', message: `Admin ${adminEmail} removed` });
+        setConfirmDelete(null);
         fetchAdmins();
+        setTimeout(() => setUploadStatus(null), 3000);
       } else {
-        alert('Failed to remove admin');
+        const data = await res.json();
+        setAdminError(data.error || 'Failed to remove admin');
       }
     } catch (error) {
-      alert('An error occurred');
+      setAdminError('An error occurred while removing admin');
+    } finally {
+      setDeletingEmail(null);
     }
   };
 
@@ -429,15 +447,15 @@ export default function AdminDashboard() {
               <Shield className="w-6 h-6 text-gray-900" />
               <span className="font-bold text-xl text-gray-900">Admin Dashboard</span>
             </div>
-            <div className="flex items-center gap-4">
-              <Link to="/" className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <Link to="/" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-gray-900">
                 <Home className="w-4 h-4" />
-                Home
+                <span className="hidden xs:inline">Home</span>
               </Link>
-              <span className="text-sm text-gray-500">{currentUser?.email}</span>
+              <span className="hidden md:inline text-sm text-gray-500">{currentUser?.email}</span>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-gray-900"
               >
                 <LogOut className="w-4 h-4" />
                 Logout
@@ -564,10 +582,21 @@ export default function AdminDashboard() {
                     {admin.email !== currentUser?.email && (
                       <button
                         onClick={() => handleRemoveAdmin(admin.email)}
-                        className="text-red-500 hover:text-red-700 p-1"
-                        title="Remove Admin"
+                        disabled={deletingEmail === admin.email}
+                        className={`flex items-center gap-2 px-2 py-1 rounded transition-all ${
+                          confirmDelete === admin.email 
+                            ? 'bg-red-500 text-white text-[10px] uppercase font-bold tracking-tighter' 
+                            : 'text-red-500 hover:bg-red-50'
+                        }`}
+                        title={confirmDelete === admin.email ? "Click again to confirm" : "Remove Admin"}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        {deletingEmail === admin.email ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : confirmDelete === admin.email ? (
+                          "Confirm?"
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
                       </button>
                     )}
                   </div>
@@ -585,7 +614,7 @@ export default function AdminDashboard() {
                     required
                     value={newAdminEmail}
                     onChange={(e) => setNewAdminEmail(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900"
                   />
                 </div>
                 <div>
@@ -595,7 +624,7 @@ export default function AdminDashboard() {
                     required
                     value={newAdminPassword}
                     onChange={(e) => setNewAdminPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent text-gray-900"
                   />
                 </div>
                 {adminError && <p className="text-red-500 text-sm">{adminError}</p>}

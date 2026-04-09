@@ -16,7 +16,8 @@ import {
   Clock,
   ShieldCheck,
   Star,
-  Phone
+  Phone,
+  Play
 } from 'lucide-react';
 import { useState, useEffect, FormEvent, useRef, MouseEvent } from 'react';
 import FoodMenu from './FoodMenu';
@@ -291,7 +292,28 @@ const Ritual = () => {
   );
 };
 
-const Portfolio = () => {
+const Portfolio = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) => {
+  const [media, setMedia] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedMedia, setSelectedMedia] = useState<any | null>(null);
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const res = await fetch('/api/gallery');
+        if (res.ok) {
+          const data = await res.json();
+          setMedia(data.slice(0, 4));
+        }
+      } catch (error) {
+        console.error('Failed to fetch gallery:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGallery();
+  }, []);
+
   useEffect(() => {
     const existingScript = document.querySelector('script[src="https://elfsightcdn.com/platform.js"]');
     if (!existingScript) {
@@ -318,12 +340,112 @@ const Portfolio = () => {
             Follow @litcigarloungepgh
           </a>
         </div>
+
+        {/* Gallery Section */}
+        <div className="mb-20">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 gap-4">
+              <div className="w-10 h-10 border-2 border-white/10 border-t-white rounded-full animate-spin" />
+              <span className="text-[10px] uppercase tracking-widest text-white/40 font-serif">Loading Gallery...</span>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                {media.map((item, i) => (
+                  <motion.div
+                    key={item.public_id || i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    onClick={() => setSelectedMedia(item)}
+                    className="group relative aspect-[4/5] overflow-hidden bg-white/5 cursor-pointer rounded-sm"
+                  >
+                    {item.resource_type === 'video' ? (
+                      <div className="w-full h-full relative">
+                        <video 
+                          src={item.secure_url} 
+                          className="w-full h-full object-cover transition-all duration-700"
+                          muted
+                          playsInline
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-transparent transition-colors">
+                          <div className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+                            <Play className="w-5 h-5 text-white fill-white" />
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <img 
+                        src={item.secure_url} 
+                        alt={`Event moment ${i}`}
+                        className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110"
+                        referrerPolicy="no-referrer"
+                      />
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+              <div className="flex justify-center">
+                <button 
+                  onClick={() => {
+                    setCurrentPage('events');
+                    window.scrollTo(0, 0);
+                  }}
+                  className="group flex items-center gap-4 text-white hover:text-white/80 transition-colors"
+                >
+                  <span className="text-[11px] uppercase tracking-[0.4em] font-serif font-bold">See More Events</span>
+                  <div className="w-10 h-px bg-white/20 group-hover:w-16 transition-all duration-500" />
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Instagram Feed */}
+        <div className="pt-20 border-t border-white/10">
+          <div className="elfsight-app-1b4cc4ee-f3f8-49b5-bc3c-0cec3e73a505" data-elfsight-app-lazy></div>
+        </div>
       </div>
 
-      <div className="max-w-[1800px] mx-auto px-6 md:px-8">
-        {/* Elfsight Instagram Feed | Lit Cigar Lounge IG Widget */}
-        <div className="elfsight-app-1b4cc4ee-f3f8-49b5-bc3c-0cec3e73a505" data-elfsight-app-lazy></div>
-      </div>
+      {/* Lightbox */}
+      {selectedMedia && (
+        <div 
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 md:p-12"
+          onClick={() => setSelectedMedia(null)}
+        >
+          <button 
+            className="absolute top-8 right-8 text-white/60 hover:text-white transition-colors"
+            onClick={() => setSelectedMedia(null)}
+          >
+            <X size={32} />
+          </button>
+          
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-6xl w-full max-h-[85vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {selectedMedia.resource_type === 'video' ? (
+              <video 
+                src={selectedMedia.secure_url} 
+                controls 
+                autoPlay 
+                className="max-w-full max-h-full shadow-2xl rounded-sm"
+              />
+            ) : (
+              <img 
+                src={selectedMedia.secure_url} 
+                alt="Selected moment" 
+                className="max-w-full max-h-full object-contain shadow-2xl rounded-sm"
+                referrerPolicy="no-referrer"
+              />
+            )}
+          </motion.div>
+        </div>
+      )}
     </section>
   );
 };
@@ -476,7 +598,7 @@ function MainApp() {
             <Hero />
             <Services />
             <Ritual />
-            <Portfolio />
+            <Portfolio setCurrentPage={setCurrentPage} />
             <Contact />
           </>
         ) : currentPage === 'food' ? (
