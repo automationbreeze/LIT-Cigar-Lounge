@@ -38,12 +38,13 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
     setCurrentPage(page);
     setIsMobileMenuOpen(false);
     if (hash) {
+      // Increase timeout to ensure component is mounted and layout is stable
       setTimeout(() => {
         const element = document.querySelector(hash);
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 100);
+      }, 300);
     } else {
       window.scrollTo(0, 0);
     }
@@ -69,10 +70,9 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
 
           <div className={`hidden md:flex gap-4 lg:gap-8 text-[12px] lg:text-[15px] font-serif font-semibold transition-colors duration-500 ${isScrolled || currentPage !== 'home' ? 'text-ink/90' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]'}`}>
             {[
-              { label: 'Drink', target: '#services' },
-              { label: 'Food', target: 'food', isPage: true },
-              { label: 'Events', target: 'events', isPage: true },
-              { label: 'About', target: '#ritual' }
+              { label: 'Home', target: '#hero' },
+              { label: 'Menu', target: 'food', isPage: true },
+              { label: 'Events', target: 'events', isPage: true }
             ].map((item) => (
               <button 
                 key={item.label}
@@ -117,10 +117,9 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
         className="md:hidden overflow-hidden bg-brand/95 backdrop-blur-md border-b border-white/10"
       >
         <div className="px-8 py-12 flex flex-col gap-8 text-2xl font-serif text-ink">
-          <button onClick={() => handleNavClick('home', '#services')} className="text-left uppercase">Drink</button>
-          <button onClick={() => handleNavClick('food')} className="text-left uppercase">Food</button>
+          <button onClick={() => handleNavClick('home', '#hero')} className="text-left uppercase">Home</button>
+          <button onClick={() => handleNavClick('food')} className="text-left uppercase">Menu</button>
           <button onClick={() => handleNavClick('events')} className="text-left uppercase">Events</button>
-          <button onClick={() => handleNavClick('home', '#ritual')} className="text-left uppercase">About</button>
         </div>
       </motion.div>
     </nav>
@@ -137,7 +136,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section id="home" className="relative min-h-[100dvh] flex flex-col justify-center items-center overflow-hidden bg-[#fdf2f4]">
+    <section id="hero" className="relative min-h-[100dvh] flex flex-col justify-center items-center overflow-hidden bg-[#fdf2f4]">
       <div className="absolute inset-0 z-0">
         <video 
           ref={videoRef}
@@ -178,7 +177,7 @@ const Hero = () => {
   );
 };
 
-const Services = () => {
+const Services = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) => {
   const categories = [
     {
       title: "High Quality Cigars",
@@ -191,10 +190,11 @@ const Services = () => {
     {
       title: "Food & Drink Specials",
       items: [
-        { name: "Craft Cocktails", detail: "Signature Lounge Blends" },
-        { name: "Single Malt Scotch", detail: "Curated Global Selection" },
-        { name: "Gourmet Bites", detail: "Chef-Inspired Pairings" },
-      ]
+        { name: "Sample Platter", detail: "Pick 4: Tenders, Mozzarella Sticks, Zucchini, Fries" },
+        { name: "Surf N' Turf", detail: "Steak & Lobster Tail (Fri-Sat Special)" },
+        { name: "Signature Salads", detail: "Choice of Salmon, Shrimp, or Steak" },
+      ],
+      isFood: true
     },
     {
       title: "Live Bands & Events",
@@ -235,6 +235,21 @@ const Services = () => {
                   </div>
                 ))}
               </div>
+              {cat.isFood && (
+                <div className="mt-12">
+                  <button 
+                    onClick={() => {
+                      setCurrentPage('food');
+                      window.scrollTo(0, 0);
+                    }}
+                    className="group flex items-center gap-4 text-white hover:text-orange-500 transition-colors"
+                  >
+                    <span className="text-[11px] uppercase tracking-[0.4em] font-serif font-bold">View Full Menu</span>
+                    <div className="w-10 h-px bg-white/20 group-hover:w-16 group-hover:bg-orange-500/50 transition-all duration-500" />
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -537,7 +552,7 @@ const Footer = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) 
         if (element) {
           element.scrollIntoView({ behavior: 'smooth' });
         }
-      }, 100);
+      }, 300);
     } else {
       window.scrollTo(0, 0);
     }
@@ -560,9 +575,8 @@ const Footer = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }) 
               <h4 className="text-[11px] uppercase tracking-[0.3em] text-white/70 mb-8">Navigation</h4>
               <ul className="space-y-4 font-serif text-white/90">
                 <li><a href="#home" onClick={(e) => handleNavClick(e, 'home')} className="hover:text-white transition-colors">Home</a></li>
-                <li><a href="#services" onClick={(e) => handleNavClick(e, 'home', '#services')} className="hover:text-white transition-colors">Drink</a></li>
-                <li><a href="#events" onClick={(e) => handleNavClick(e, 'home', '#events')} className="hover:text-white transition-colors">Events</a></li>
-                <li><a href="#ritual" onClick={(e) => handleNavClick(e, 'home', '#ritual')} className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#menu" onClick={(e) => handleNavClick(e, 'food')} className="hover:text-white transition-colors">Menu</a></li>
+                <li><a href="#events" onClick={(e) => handleNavClick(e, 'events')} className="hover:text-white transition-colors">Events</a></li>
               </ul>
             </div>
             <div>
@@ -596,7 +610,7 @@ function MainApp() {
         {currentPage === 'home' ? (
           <>
             <Hero />
-            <Services />
+            <Services setCurrentPage={setCurrentPage} />
             <Ritual />
             <Portfolio setCurrentPage={setCurrentPage} />
             <Contact />
