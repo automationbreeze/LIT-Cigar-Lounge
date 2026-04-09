@@ -101,7 +101,7 @@ const Navbar = ({ currentPage, setCurrentPage }: { currentPage: string, setCurre
             </span>
           </a>
           <button 
-            onClick={() => handleNavClick('home', '#contact')} 
+            onClick={() => handleNavClick('home', '#booking')} 
             className="bg-ink text-white px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 text-[9px] sm:text-[10px] lg:text-[11px] uppercase tracking-widest transition-all hover:bg-zinc-800 whitespace-nowrap"
           >
             <span className="sm:hidden">Book</span>
@@ -228,9 +228,6 @@ const Services = ({ setCurrentPage }: { setCurrentPage: (page: string) => void }
                     <div>
                       <h3 className="text-2xl font-serif text-white group-hover:text-orange-500 transition-colors">{item.name}</h3>
                       <p className="text-white/60 text-sm italic">{item.detail}</p>
-                    </div>
-                    <div className="text-white/50 group-hover:text-orange-500 transition-colors">
-                      <ChevronRight size={20} />
                     </div>
                   </div>
                 ))}
@@ -479,29 +476,43 @@ const Contact = () => {
       <div className="max-w-[1800px] mx-auto px-6 md:px-8">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-32">
           <div>
-            <h2 className="text-5xl md:text-7xl font-serif text-ink mb-8 md:mb-12 tracking-tighter">Book A Section</h2>
-            <p className="text-ink/70 text-lg md:text-xl font-serif leading-relaxed max-w-md">
-              Join us for an evening of sophisticated relaxation. For groups larger than 6, please contact us directly.
-            </p>
-            
-            <div className="mt-12 md:mt-20 space-y-6 md:space-y-8 text-ink/90 font-serif">
+            <div className="space-y-6 md:space-y-8 text-ink/90 font-serif">
               <div>
-                <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-2 opacity-40">Location</h4>
-                <p className="text-xl md:text-2xl">Pittsburgh, PA 15222</p>
+                <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-2 opacity-70">Location</h4>
+                <p className="text-xl md:text-2xl">6525 Hamilton Ave, Pittsburgh, PA 15206</p>
               </div>
               <div>
-                <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-2 opacity-40">Hours</h4>
+                <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-2 opacity-70">Hours</h4>
                 <p className="text-xl md:text-2xl">Mon-Thu: 2PM - 11PM</p>
                 <p className="text-xl md:text-2xl">Fri-Sat: 12PM - 1AM</p>
               </div>
               <div>
-                <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-2 opacity-40">Phone</h4>
+                <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] mb-2 opacity-70">Phone</h4>
                 <a href="tel:4124926902" className="text-xl md:text-2xl hover:text-ink/70 transition-colors">(412) 492-6902</a>
               </div>
             </div>
+
+            <div className="mt-12 rounded-sm overflow-hidden border border-ink/10 grayscale hover:grayscale-0 transition-all duration-700">
+              <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3035.794715505081!2d-79.91428232344464!3d40.45773177143283!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8834f2166927a361%3A0x86831d1f0579e58b!2s6525%20Hamilton%20Ave%2C%20Pittsburgh%2C%20PA%2015206!5e0!3m2!1sen!2sus!4v1712689500000!5m2!1sen!2sus" 
+                width="100%" 
+                height="300" 
+                style={{ border: 0 }} 
+                allowFullScreen={true} 
+                loading="lazy" 
+                referrerPolicy="no-referrer-when-downgrade"
+                title="LIT Cigar Lounge Location"
+              ></iframe>
+            </div>
           </div>
 
-          <div className="flex flex-col justify-center">
+          <div id="booking" className="flex flex-col justify-center scroll-mt-32">
+            <div className="mb-12 lg:mb-16">
+              <h2 className="text-5xl md:text-7xl font-serif text-ink mb-8 tracking-tighter">Book A Section</h2>
+              <p className="text-ink/70 text-lg md:text-xl font-serif leading-relaxed max-w-md">
+                Join us for an evening of sophisticated relaxation. For groups larger than 6, please contact us directly.
+              </p>
+            </div>
             {formState === 'success' ? (
               <div className="text-center py-20">
                 <h3 className="text-3xl md:text-4xl font-serif text-ink mb-4">Confirmed</h3>
